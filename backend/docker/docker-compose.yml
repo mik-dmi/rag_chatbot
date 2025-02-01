@@ -1,0 +1,31 @@
+version: "3.4"
+
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.28.4
+    restart: on-failure
+    ports:
+      - "8080:8080" # REST API endpoint
+      - "50051:50051" # gRPC endpoint
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    environment:
+      # Core settings
+      QUERY_DEFAULTS_LIMIT: "20" # default query limit (adjustable)
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true" # anonymous access (not recommended for production)
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate" # path for persistent data storage
+      CLUSTER_HOSTNAME: "node1"
+
+      # Module configuration for vectorization using text2vec-transformers
+      DEFAULT_VECTORIZER_MODULE: "text2vec-transformers"
+      ENABLE_MODULES: "text2vec-transformers"
+      TRANSFORMERS_INFERENCE_API: "http://t2v-transformers:8080" # endpoint for the inference service
+
+  t2v-transformers:
+    image: cr.weaviate.io/semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
+    environment:
+      ENABLE_CUDA: "0" # set to "1" if you are running on GPU hardware
+      # NVIDIA_VISIBLE_DEVICES: "all"  # uncomment if using CUDA
+
+volumes:
+  weaviate_data:
