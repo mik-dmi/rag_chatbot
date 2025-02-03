@@ -7,14 +7,22 @@ import (
 	"os"
 	"time"
 
+	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	middleware "github.com/mik-dmi/rag_chatbot/backend/utils"
 )
 
 type application struct {
 	config config
+	store  store.Storage
 }
 type config struct {
+	addr     string
+	vectorDB vectorDBConfig
+}
+
+type vectorDBConfig struct {
 	addr string
+	host string
 }
 
 func (app *application) mount() *http.ServeMux {

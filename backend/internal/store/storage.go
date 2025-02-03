@@ -1,14 +1,18 @@
 package store
 
-import "context"
+import (
+	"context"
+
+	"github.com/weaviate/weaviate-go-client/v4/weaviate"
+)
 
 type Storage struct {
 	Queries interface {
 		GetResponse(string, context.Context) (string, error)
 	}
-	Documents interface {
-		Create([]string, context.Context) error
-		Delete(string, context.Context) error
+	Vectors interface {
+		CreateVectors([]string, context.Context) error
+		DeleteVectors(string, context.Context) error
 	}
 	Users interface {
 		CreateSession(context.Context) error
@@ -16,12 +20,10 @@ type Storage struct {
 	}
 }
 
-
-func NewWeaviateStorage( db * ) Storage{
+func NewWeaviateStorage(client *weaviate.Client) Storage {
 	return Storage{
-		Documents: &DocumentsStore( db)
-		Users: &UsersStore(db)
-		Queries: &
-		
+		Vectors: &VectorsStore{client},
+		Users:   &UsersStore{client},
+		Queries: &QueriesStore{client},
 	}
 }

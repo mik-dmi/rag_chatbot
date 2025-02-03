@@ -7,31 +7,27 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
-	"github.com/tmc/langchaingo/embeddings"
-	"github.com/tmc/langchaingo/llms/openai"
-	"github.com/tmc/langchaingo/vectorstores/weaviate"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
+	langchain_weaviate "github.com/tmc/langchaingo/vectorstores/weaviate"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
-func GetSchema() {
-	cfg := weaviate.Config{
-		Host:   "localhost:8080",
+func GetWeaviateClient(_ context.Context, cfg config) (*weaviate.Client, error) {
+	config := weaviate.Config{
+		Host:   fmt.Sprintf("%s%s", cfg.vectorDB.host, cfg.vectorDB.addr),
 		Scheme: "http",
 	}
-	client, err := weaviate.NewClient(cfg)
+	client, err := weaviate.NewClient(config)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+	return client, nil
 
-	schema, err := client.Schema().Getter().Do(context.Background())
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(schema)
 }
 
 func setupWeaviate(_ context.Context, cfg config) (any, error) {
 
-	openaiClient, err := openai.New(
+	/*openaiClient, err := openai.New(
 		openai.WithModel("gpt-3.5-turbo-0125"),
 		openai.WithEmbeddingModel(embeddingModelName),
 	)
@@ -41,14 +37,13 @@ func setupWeaviate(_ context.Context, cfg config) (any, error) {
 	emb, err := embeddings.NewEmbedder(openaiClient)
 	if err != nil {
 		return nil, err
-	}
-	wvStore, err := weaviate.New(
-		weaviate.WithEmbedder(emb),
-		weaviate.WithScheme("http"),
-		weaviate.WithHost("8080"),
-		weaviate.WithIndexName("Document"),
+	}*/
+	wvStore, err := langchain_weaviate.New(
+		//langchain_weaviate.WithEmbedder(emb),
+		langchain_weaviate.WithScheme("http"),
+		langchain_weaviate.WithHost("8080"),
+		langchain_weaviate.WithIndexName("Document"),
 	)
-
 	if err != nil {
 		return nil, err
 	}
@@ -61,24 +56,27 @@ func main() {
 
 	err := godotenv.Load()
 
-	weaviate, err := setupWeaviate(ctx, cfg)
-	if err != nil {
-		logger.Fatal().Err(err).Msg("failed to setup weave")
+	cfg := config{
+		addr: env.GetString("ADDR", ":8080"),
+		vectorDB: vectorDBConfig{
+			addr: env.GetString("VECTOR_DB_PORT", "8080"),
+			host: env.GetString("VECTOR_DB_HOST", "http://localhost"),
+		},
 	}
-	GetSchema()
+
+	weaviateClient, err := GetWeaviateClient(nil, cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-
-	cfg := config{
-		addr: env.GetString("ADDR", ":8000"),
-	}
+	store := store.NewWeaviateStorage(weaviateClient)
 	app := &application{
 		config: cfg,
+		store:  store,
 	}
 	mux := app.mount()
-
 	log.Fatal(app.Run(mux))
-
 }

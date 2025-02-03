@@ -1,10 +1,15 @@
-package queries 
+package store
 
-type QueriesStore struct{
-	db *
+import (
+	"context"
+
+	"github.com/weaviate/weaviate-go-client/v4/weaviate"
+)
+
+type QueriesStore struct {
+	client *weaviate.Client
 }
 
-
-func (q *QueriesStore)   GetResponse (userQuery string, context.Context, ctx context.Context)  string, error {
-	return "", nil 	
+func (q *QueriesStore) GetResponse(userQuery string, ctx context.Context) (string, error) {
+	return "", nil
 }
