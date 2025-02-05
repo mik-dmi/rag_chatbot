@@ -26,13 +26,13 @@ type vectorDBConfig struct {
 }
 
 func (app *application) mount() *http.ServeMux {
-	mux := http.NewServeMux()
+	router := http.NewServeMux()
 
-	mux.HandleFunc("POST /query", app.healthCheckHandler)
-	mux.HandleFunc("POST /vector-db", app.healthCheckHandler)
+	router.HandleFunc("POST /query", app.healthCheckHandler)
+	router.HandleFunc("POST /vector-db", app.healthCheckHandler)
 
 	v1 := http.NewServeMux()
-	v1.Handle("/v1/", http.StripPrefix("/v1", mux)) //dealing with subrouting
+	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting
 	return v1
 
 }

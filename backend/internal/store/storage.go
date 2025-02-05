@@ -8,11 +8,11 @@ import (
 
 type Storage struct {
 	Queries interface {
-		GetResponse(string, context.Context) (string, error)
+		GetRAGResponse(context.Context, string) (string, error)
 	}
 	Vectors interface {
-		CreateVectors([]string, context.Context) error
-		DeleteVectors(string, context.Context) error
+		CreateVectors(context.Context, []string) error
+		DeleteVectors(context.Context, string) error
 	}
 	Users interface {
 		CreateSession(context.Context) error
