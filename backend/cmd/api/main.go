@@ -1,19 +1,17 @@
 package main
 
 import (
-	"context"
 	"log"
 
 	"github.com/joho/godotenv"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/db"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
-	langchain_weaviate "github.com/tmc/langchaingo/vectorstores/weaviate"
 )
 
+/*
 func setupWeaviate(_ context.Context, cfg config) (any, error) {
-
-	/*openaiClient, err := openai.New(
+	openaiClient, err := openai.New(
 		openai.WithModel("gpt-3.5-turbo-0125"),
 		openai.WithEmbeddingModel(embeddingModelName),
 	)
@@ -23,7 +21,7 @@ func setupWeaviate(_ context.Context, cfg config) (any, error) {
 	emb, err := embeddings.NewEmbedder(openaiClient)
 	if err != nil {
 		return nil, err
-	}*/
+	}
 	wvStore, err := langchain_weaviate.New(
 		//langchain_weaviate.WithEmbedder(emb),
 		langchain_weaviate.WithScheme("http"),
@@ -33,14 +31,15 @@ func setupWeaviate(_ context.Context, cfg config) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return &wvStore, nil
-
 }
+*/
+
+const version = "0.0.1"
 
 func main() {
 
-	err := godotenv.Load()
+	err := godotenv.Load() //"../../.env"
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
@@ -51,9 +50,10 @@ func main() {
 			addr: env.GetString("VECTOR_DB_PORT", "8080"),
 			host: env.GetString("VECTOR_DB_HOST", "http://localhost"),
 		},
+		env: env.GetString("ENV", "development"),
 	}
 
-	weaviateClient, err := db.NewWeaviateClient(nil, cfg.vectorDB.host, cfg.vectorDB.addr)
+	weaviateClient, err := db.NewWeaviateClient(cfg.vectorDB.host, cfg.vectorDB.addr)
 	if err != nil {
 		log.Fatal(err)
 	}

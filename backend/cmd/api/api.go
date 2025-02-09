@@ -18,6 +18,7 @@ type application struct {
 type config struct {
 	addr     string
 	vectorDB vectorDBConfig
+	env      string
 }
 
 type vectorDBConfig struct {
@@ -29,7 +30,7 @@ func (app *application) mount() *http.ServeMux {
 	router := http.NewServeMux()
 
 	router.HandleFunc("POST /query", app.healthCheckHandler)
-	router.HandleFunc("POST /vector-db", app.healthCheckHandler)
+	router.HandleFunc("POST /vector-db", app.createVectorHandler)
 
 	v1 := http.NewServeMux()
 	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting
