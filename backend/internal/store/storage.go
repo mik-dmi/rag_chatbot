@@ -11,7 +11,7 @@ type Storage struct {
 		GetRAGResponse(context.Context, string) (string, error)
 	}
 	Vectors interface {
-		CreateVectors(context.Context, *Documents) error
+		CreateVectors(context.Context, *RagData) error
 		DeleteVectors(context.Context, string) error
 	}
 	Users interface {

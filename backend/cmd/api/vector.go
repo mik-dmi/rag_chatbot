@@ -7,12 +7,11 @@ import (
 )
 
 type CreateDocumentsPayload struct {
-	UserID   string           `json:"userid"`
-	Document []store.Document `json:"document"`
+	UserID    string           `json:"userid"`
+	Documents []store.Document `json:"document"`
 }
 
 func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Request) {
-
 	var documents CreateDocumentsPayload
 	if err := readJSON(w, r, &documents); err != nil {
 		writeJSONError(w, http.StatusBadRequest, err.Error())
@@ -21,15 +20,22 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 
 	userId := "1"
 
-	vector := &store.Documents{
+	vector := &store.RagData{
 		UserID: userId,
 	}
 
-	for _, doc := range documents.Document {
-		vector.Document = append(vector.Document, store.Document{
-			Title:   doc.Title,
-			Content: doc.Content,
-		})
+	for _, doc := range documents.Documents {
+		for _, subsection := range doc.Subsections {
+			vector.Documents = append(vector.Documents, store.Document{
+				Chapter: doc.Chapter,
+				Subsections: []store.Subsection{
+					{
+						Title:   subsection.Title,
+						Content: subsection.Content,
+					},
+				},
+			})
+		}
 	}
 
 	ctx := r.Context()

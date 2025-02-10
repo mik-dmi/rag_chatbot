@@ -13,7 +13,7 @@ func NewWeaviateClient(host string, addr string) (*weaviate.Client, error) {
 		Host:   fmt.Sprintf("%s%s", host, addr),
 		Scheme: "http",
 	}
-	client, err := weaviate.NewClient(config)
+	client, err := weaviate.New(config)
 	if err != nil {
 		return nil, err
 	}
