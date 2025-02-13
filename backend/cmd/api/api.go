@@ -29,8 +29,10 @@ type vectorDBConfig struct {
 func (app *application) mount() *http.ServeMux {
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /query", app.healthCheckHandler)
+	router.HandleFunc("POST /query", app.userQueryHandler)
 	router.HandleFunc("POST /vector-db", app.createVectorHandler)
+	router.HandleFunc("GET /vector-db/object/{id}", app.getVectorObjectByIdHandler)
+	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
 
 	v1 := http.NewServeMux()
 	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting

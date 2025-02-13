@@ -1,14 +1,19 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 )
 
 type CreateDocumentsPayload struct {
-	UserID    string           `json:"userid"`
+	UserID    string           `json:"user_id"`
 	Documents []store.Document `json:"document"`
+}
+type UserQuery struct {
+	UserID      string `json:"user_id"`
+	UserMessage string `json:"user_message"`
 }
 
 func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,5 +54,44 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+}
+
+func (app *application) userQueryHandler(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	var query UserQuery
+
+	if err := readJSON(w, r, &query); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	result, err := app.store.Vectors.GetClosestVectors(ctx, query.UserMessage)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := writeJSON(w, http.StatusCreated, result); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+}
+
+func (app *application) getVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	fmt.Print(id)
+
+	vectorObject, err := app.store.Vectors. (ctx, query.UserMessage)
+
+
+
+
+
+	
+}
+func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Print(r.PathValue("id"))
 
 }

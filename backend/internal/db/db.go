@@ -13,11 +13,12 @@ func NewWeaviateClient(host string, addr string) (*weaviate.Client, error) {
 		Host:   fmt.Sprintf("%s%s", host, addr),
 		Scheme: "http",
 	}
-	client, err := weaviate.New(config)
+	client, err := weaviate.NewClient(config)
 	if err != nil {
 		return nil, err
 	}
-
+	
+	
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	liveStatus, err := client.Misc().LiveChecker().Do(ctx)
