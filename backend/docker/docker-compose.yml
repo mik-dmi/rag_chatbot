@@ -1,5 +1,3 @@
-version: "3.4"
-
 services:
   weaviate:
     image: cr.weaviate.io/semitechnologies/weaviate:1.28.4
@@ -7,13 +5,13 @@ services:
     ports:
       - "8080:8080" # REST API endpoint
       - "50051:50051" # gRPC endpoint
-    volumes:
-      - weaviate_data:/var/lib/weaviate
+    #volumes:
+    # - weaviate_data:/var/lib/weaviate
     environment:
       # Core settings
       QUERY_DEFAULTS_LIMIT: "20" # default query limit (adjustable)
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true" # anonymous access (not recommended for production)
-      PERSISTENCE_DATA_PATH: "/var/lib/weaviate" # path for persistent data storage
+      #PERSISTENCE_DATA_PATH: "/var/lib/weaviate" # path for persistent data storage
       CLUSTER_HOSTNAME: "node1"
 
       # Module configuration for vectorization using text2vec-transformers

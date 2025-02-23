@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
-	middleware "github.com/mik-dmi/rag_chatbot/backend/utils"
+	"github.com/mik-dmi/rag_chatbot/backend/utils/middleware"
 )
 
 type application struct {

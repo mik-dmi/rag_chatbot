@@ -25,32 +25,39 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 
 	userId := "1"
 
-	vector := &store.RagData{
-		UserID: userId,
-	}
+	var aggregatedDocuments []store.Document
 
 	for _, doc := range documents.Documents {
+		// Create a slice to hold all subsections for the current chapter.
+		var subsections []store.Subsection
 		for _, subsection := range doc.Subsections {
-			vector.Documents = append(vector.Documents, store.Document{
-				Chapter: doc.Chapter,
-				Subsections: []store.Subsection{
-					{
-						Title:   subsection.Title,
-						Content: subsection.Content,
-					},
-				},
+			subsections = append(subsections, store.Subsection{
+				Title:   subsection.Title,
+				Content: subsection.Content,
 			})
 		}
+
+		// Append the aggregated document.
+		aggregatedDocuments = append(aggregatedDocuments, store.Document{
+			Chapter:     doc.Chapter,
+			Subsections: subsections,
+		})
+	}
+
+	vector := &store.RagData{
+		UserID:    userId,
+		Documents: aggregatedDocuments,
 	}
 
 	ctx := r.Context()
 
-	if err := app.store.Vectors.CreateVectors(ctx, vector); err != nil {
+	vectorsCreated, err := app.store.Vectors.CreateVectors(ctx, vector)
+	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	if err := writeJSON(w, http.StatusCreated, vector); err != nil {
+	if err := writeJSON(w, http.StatusCreated, vectorsCreated); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -83,13 +90,8 @@ func (app *application) getVectorObjectByIdHandler(w http.ResponseWriter, r *htt
 	id := r.PathValue("id")
 	fmt.Print(id)
 
-	vectorObject, err := app.store.Vectors. (ctx, query.UserMessage)
+	//vectorObject, err := app.store.Vectors. (ctx, query.UserMessage)
 
-
-
-
-
-	
 }
 func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Print(r.PathValue("id"))
