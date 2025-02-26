@@ -132,7 +132,16 @@ func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]D
 	return response, nil
 }
 
-func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName string) error {
+func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName string) (string, error) {
+
+	ok, err := d.chapterExists(ctx, chapterName)
+	if err != nil {
+		return "", fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
+	}
+	if !ok {
+		return "", fmt.Errorf("error can not delete chapter, chapter %s does not exits", chapterName)
+	}
+
 	result, err := d.client.GraphQL().Get().
 		WithClassName("Book").
 		WithFields(
@@ -235,6 +244,7 @@ func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, e
 	return documents, nil
 }
 
+// false = chapter not found / true = chapter found
 func (d *VectorsStore) chapterExists(ctx context.Context, chapter string) (bool, error) {
 	response, err := d.client.GraphQL().Get().
 		WithClassName("Book").
@@ -246,21 +256,16 @@ func (d *VectorsStore) chapterExists(ctx context.Context, chapter string) (bool,
 		WithLimit(1).
 		Do(ctx)
 	if err != nil {
-		fmt.Println("Yes 1")
+
 		return false, err
 	}
-
 	getData, ok := response.Data["Get"].(map[string]any)
 	if !ok {
-		fmt.Println("Yes 2")
 		return false, fmt.Errorf("invalid response structure: missing 'Get'")
 	}
-
 	rawBooks, ok := getData["Book"].([]any)
-	//  no chapter found
 	if !ok || len(rawBooks) == 0 {
 		return false, nil
 	}
-	//  chapter found
 	return true, nil
 }
