@@ -132,6 +132,44 @@ func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]D
 	return response, nil
 }
 
+func (d *VectorsStore) GetObjectIDById(ctx context.Context, query string) (string, error) {
+
+	result, err := d.client.GraphQL().Get().
+		WithClassName("Book").
+		WithWhere(
+			filters.Where().
+				WithPath([]string{"chapter"}).
+				WithOperator(filters.Equal).
+				WithValueText(query),
+		).
+		WithFields(
+			graphql.Field{
+				Name: "_additional",
+				Fields: []graphql.Field{
+					{
+						Name: "id",
+					},
+				},
+			},
+		).
+		Do(ctx)
+	if err != nil {
+		return "", fmt.Errorf("failed to get object by chapter %s: %w", query, err)
+	}
+
+	jsonBytes, err := result.MarshalBinary()
+	if err != nil {
+		return "", err
+	}
+
+	jsonStr := string(jsonBytes)
+
+	fmt.Println("Response from jsonStr:", jsonStr)
+
+	return jsonStr, nil
+
+}
+
 func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName string) (string, error) {
 
 	ok, err := d.chapterExists(ctx, chapterName)
@@ -141,31 +179,25 @@ func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName str
 	if !ok {
 		return "", fmt.Errorf("error can not delete chapter, chapter %s does not exits", chapterName)
 	}
-
-	result, err := d.client.GraphQL().Get().
+	result, err := d.client.Batch().
+		ObjectsBatchDeleter().
 		WithClassName("Book").
-		WithFields(
-			graphql.Field{Name: "chapter"},
-			graphql.Field{Name: "title"},
-			graphql.Field{Name: "content"},
-			graphql.Field{
-				Name: "_additional",
-				Fields: []graphql.Field{
-					{Name: "id"},
-				},
-			}).
-		WithWhere(filters.Where().
-			WithPath([]string{"chapter"}).
-			WithOperator(filters.Equal).
-			WithValueText(chapterName)).
-		Do(context.Background())
+		WithWhere(
+			filters.Where().
+				WithPath([]string{"chapter"}).
+				WithOperator(filters.Equal).
+				WithValueText(chapterName),
+		).
+		WithOutput("verbose").
+		Do(ctx)
+
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	fmt.Print(result)
 
-	return nil
+	return *result.Output, nil
 }
 
 func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, error) {

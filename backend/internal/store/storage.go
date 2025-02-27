@@ -10,8 +10,9 @@ type Storage struct {
 	Vectors interface {
 		CreateVectors(context.Context, *RagData) (*VectorCreatedResponse, error)
 		GetClosestVectors(context.Context, string) ([]Document, error)
-		DeleteChapterVectors(context.Context, string) error
+		DeleteChapterVectors(context.Context, string) (string, error)
 		chapterExists(context.Context, string) (bool, error)
+		GetObjectIDById(context.Context, string) (string, error)
 	}
 	Users interface {
 		CreateSession(context.Context) error

@@ -86,14 +86,31 @@ func (app *application) userQueryHandler(w http.ResponseWriter, r *http.Request)
 
 }
 
-func (app *application) getVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	fmt.Print(id)
+type GetChapterNameIDBody struct {
+	ChapterName string `json:"chapter_name"`
+}
 
-	//vectorObject, err := app.store.Vectors. (ctx, query.UserMessage)
+func (app *application) getObjectIDByIdHandler(w http.ResponseWriter, r *http.Request) {
+	var chapterName GetChapterNameIDBody
+	if err := readJSON(w, r, &chapterName); err != nil {
+		writeJSONError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	ctx := r.Context()
+	objectIDRetrieved, err := app.store.Vectors.GetObjectIDById(ctx, chapterName.ChapterName)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if err := writeJSON(w, http.StatusCreated, objectIDRetrieved); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 }
+
 func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Print(r.PathValue("id"))
+	id := r.PathValue("id")
+	fmt.Print(r.PathValue(id))
 
 }
