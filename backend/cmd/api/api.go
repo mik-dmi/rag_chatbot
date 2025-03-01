@@ -31,7 +31,7 @@ func (app *application) mount() *http.ServeMux {
 
 	router.HandleFunc("POST /query", app.userQueryHandler)
 	router.HandleFunc("POST /vector-db", app.createVectorHandler)
-	router.HandleFunc("GET /vector-db/object", app.getObjectIDByIdHandler)
+	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
 	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
 
 	v1 := http.NewServeMux()

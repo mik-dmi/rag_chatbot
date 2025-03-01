@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
@@ -38,6 +39,26 @@ type Query struct {
 
 type VectorCreatedResponse struct {
 	ChaptersCreated []string `json:"list_of_chapters_created"`
+}
+
+type GraphQLResponse struct {
+	Data struct {
+		Get struct {
+			Book []struct {
+				Additional struct {
+					ID string `json:"id"`
+				} `json:"_additional"`
+			} `json:"Book"`
+		} `json:"Get"`
+	} `json:"data"`
+}
+
+type IDResponse struct {
+	Id string `json:"id"`
+}
+
+type SuccessfullyDeleted struct {
+	Message string `json:"message"`
 }
 
 func (d *VectorsStore) CreateVectors(ctx context.Context, data *RagData) (*VectorCreatedResponse, error) {
@@ -132,7 +153,7 @@ func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]D
 	return response, nil
 }
 
-func (d *VectorsStore) GetObjectIDById(ctx context.Context, query string) (string, error) {
+func (d *VectorsStore) GetObjectIDByChapter(ctx context.Context, query string) (*IDResponse, error) {
 
 	result, err := d.client.GraphQL().Get().
 		WithClassName("Book").
@@ -154,30 +175,70 @@ func (d *VectorsStore) GetObjectIDById(ctx context.Context, query string) (strin
 		).
 		Do(ctx)
 	if err != nil {
-		return "", fmt.Errorf("failed to get object by chapter %s: %w", query, err)
+		return nil, fmt.Errorf("failed to get object by chapter %s: %w", query, err)
 	}
 
+	// Unmarshal the response into the struct
 	jsonBytes, err := result.MarshalBinary()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	jsonStr := string(jsonBytes)
+	var response GraphQLResponse
+	if err := json.Unmarshal(jsonBytes, &response); err != nil {
+		return nil, fmt.Errorf("failed to parse response JSON: %w", err)
+	}
 
-	fmt.Println("Response from jsonStr:", jsonStr)
+	if len(response.Data.Get.Book) > 0 {
+		objIDResponse := &IDResponse{
+			Id: response.Data.Get.Book[0].Additional.ID,
+		}
+		fmt.Println(objIDResponse)
 
-	return jsonStr, nil
+		return objIDResponse, nil
+	}
 
+	return nil, fmt.Errorf("no object found for chapter: %s", query)
 }
 
-func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName string) (string, error) {
+func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string) (*SuccessfullyDeleted, error) {
+	obj, err := d.client.Data().ObjectsGetter().
+		WithClassName("Book").
+		WithID(idToDelete).
+		Do(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%sretrieving object with id %s", err.Error(), idToDelete)
+	}
+	if obj == nil {
+		return nil, fmt.Errorf("object with id %s does not exist", idToDelete)
+	}
+
+	err = d.client.Data().
+		Deleter().
+		WithClassName("Book").
+		WithID(idToDelete).
+		Do(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("error deleting object with id %s: %w", idToDelete, err)
+	}
+
+	response := &SuccessfullyDeleted{
+		Message: "Object deleted successfully ",
+	}
+
+	return response, nil
+}
+
+// there is no endpoint for this action in the api
+func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapterName string) (*SuccessfullyDeleted, error) {
 
 	ok, err := d.chapterExists(ctx, chapterName)
 	if err != nil {
-		return "", fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
+		return nil, fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
 	}
 	if !ok {
-		return "", fmt.Errorf("error can not delete chapter, chapter %s does not exits", chapterName)
+		return nil, fmt.Errorf("error can not delete chapter, chapter %s does not exits", chapterName)
 	}
 	result, err := d.client.Batch().
 		ObjectsBatchDeleter().
@@ -192,12 +253,16 @@ func (d *VectorsStore) DeleteChapterVectors(ctx context.Context, chapterName str
 		Do(ctx)
 
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	fmt.Print(result)
 
-	return *result.Output, nil
+	response := &SuccessfullyDeleted{
+		Message: *result.Output,
+	}
+
+	return response, nil
 }
 
 func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, error) {

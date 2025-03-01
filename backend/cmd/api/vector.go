@@ -79,7 +79,7 @@ func (app *application) userQueryHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	if err := writeJSON(w, http.StatusCreated, result); err != nil {
+	if err := writeJSON(w, http.StatusOK, result); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -90,19 +90,19 @@ type GetChapterNameIDBody struct {
 	ChapterName string `json:"chapter_name"`
 }
 
-func (app *application) getObjectIDByIdHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) getObjectIDByChapterHandler(w http.ResponseWriter, r *http.Request) {
 	var chapterName GetChapterNameIDBody
 	if err := readJSON(w, r, &chapterName); err != nil {
 		writeJSONError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	ctx := r.Context()
-	objectIDRetrieved, err := app.store.Vectors.GetObjectIDById(ctx, chapterName.ChapterName)
+	objectIDRetrieved, err := app.store.Vectors.GetObjectIDByChapter(ctx, chapterName.ChapterName)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	if err := writeJSON(w, http.StatusCreated, objectIDRetrieved); err != nil {
+	if err := writeJSON(w, http.StatusOK, objectIDRetrieved); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -113,4 +113,15 @@ func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *
 	id := r.PathValue("id")
 	fmt.Print(r.PathValue(id))
 
+	ctx := r.Context()
+	response, err := app.store.Vectors.DeleteObjectWithID(ctx, id)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if err := writeJSON(w, http.StatusOK, response); err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 }
