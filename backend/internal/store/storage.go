@@ -6,7 +6,7 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
-type Storage struct {
+type WeaviateStorage struct {
 	Vectors interface {
 		CreateVectors(context.Context, *RagData) (*VectorCreatedResponse, error)
 		GetClosestVectors(context.Context, string) ([]Document, error)
@@ -16,15 +16,23 @@ type Storage struct {
 		DeleteChapterWithChapterName(context.Context, string) (*SuccessfullyDeleted, error)
 		DeleteObjectWithID(context.Context, string) (*SuccessfullyDeleted, error)
 	}
-	Users interface {
+}
+type RedisStorage struct {
+	ChatHistory interface {
 		CreateSession(context.Context) error
+		PostChatData(context.Context) error
 		GetChatHistory(context.Context) error
 	}
 }
 
-func NewWeaviateStorage(client *weaviate.Client) Storage {
-	return Storage{
+func NewWeaviateStorage(client *weaviate.Client) WeaviateStorage {
+	return WeaviateStorage{
 		Vectors: &VectorsStore{client},
-		Users:   &UsersStore{client},
+	}
+}
+
+func NewRedisStorage(client *reddis.Client) RedisStorage {
+	return RedisStorage{
+		ChatHistory: &ChatHistoryStore{client},
 	}
 }

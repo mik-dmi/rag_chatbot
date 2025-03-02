@@ -2,8 +2,6 @@ package store
 
 import (
 	"context"
-
-	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
 type Message struct {
@@ -18,14 +16,18 @@ type User struct {
 	IP          string    `json:"ip"`
 }
 
-type UsersStore struct {
-	client *weaviate.Client
+type ChatHistoryStore struct {
+	client *redis.Client
 }
 
-func (s *UsersStore) CreateSession(ctx context.Context) error {
+func (s *ChatHistoryStore) CreateSession(ctx context.Context) error {
 	return nil
 }
 
-func (s *UsersStore) GetChatHistory(ctx context.Context) error {
+func (s *ChatHistoryStore) PostChatData(ctx context.Context) error {
+	return nil
+}
+
+func (s *ChatHistoryStore) GetChatHistory(ctx context.Context) error {
 	return nil
 }

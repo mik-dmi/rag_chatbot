@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
+	"github.com/tmc/langchaingo/prompts"
 )
 
 type CreateDocumentsPayload struct {
@@ -64,7 +65,7 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 
 }
 
-func (app *application) userQueryHandler(w http.ResponseWriter, r *http.Request) {
+func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	var query UserQuery
 
@@ -74,6 +75,21 @@ func (app *application) userQueryHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	result, err := app.store.Vectors.GetClosestVectors(ctx, query.UserMessage)
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	var prompt = prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
+		promptTemplate,
+		prompts.NewHumanMessagePromptTemplate(
+			`CHAT HISTORY: {{.chat_history}}
+	CONTEXT: {{.context}}
+	QUESTION: {{.question}}`,
+			[]string{"chat_history", "context", "question"},
+		),
+	})
+
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return

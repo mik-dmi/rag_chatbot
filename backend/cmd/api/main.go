@@ -58,10 +58,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	store := store.NewWeaviateStorage(weaviateClient)
+	redisClient, err := db.NewWeaviateClient(cfg.vectorDB.host, cfg.vectorDB.addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	weaviateStore := store.NewWeaviateStorage(weaviateClient)
+	redisStore := store.RedisStorage(redisClient)
 	app := &application{
-		config: cfg,
-		store:  store,
+		config:        cfg,
+		weaviateStore: weaviateStore,
+		redisStore:    redisStore,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

@@ -12,8 +12,9 @@ import (
 )
 
 type application struct {
-	config config
-	store  store.Storage
+	config        config
+	weaviateStore store.WeaviateStorage
+	redisStore    store.RedisStorage
 }
 type config struct {
 	addr     string
@@ -29,7 +30,7 @@ type vectorDBConfig struct {
 func (app *application) mount() *http.ServeMux {
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /query", app.userQueryHandler)
+	router.HandleFunc("POST /query", app.userQuestionHandler)
 	router.HandleFunc("POST /vector-db", app.createVectorHandler)
 	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
 	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
