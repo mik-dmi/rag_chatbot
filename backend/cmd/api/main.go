@@ -46,25 +46,31 @@ func main() {
 
 	cfg := config{
 		addr: env.GetString("ADDR", ":8080"),
-		vectorDB: vectorDBConfig{
-			addr: env.GetString("VECTOR_DB_PORT", "8080"),
-			host: env.GetString("VECTOR_DB_HOST", "http://localhost"),
+		weaviateDB: weaviateDBConfig{
+			addr: env.GetString("WEAVIATE_DB_PORT", ":8080"),
+			host: env.GetString("WEAVIATE_DB_HOST", "localhost"),
 		},
+		redisDB: redisDBConfig{
+			addr:     env.GetString("REDIS_DB_PORT", ":6379"),
+			host:     env.GetString("REDIS_DB_HOST", "localhost"),
+			password: env.GetString("REDIS_PASSWORD", "redis_password"),
+		},
+
 		env: env.GetString("ENV", "development"),
 	}
 
-	weaviateClient, err := db.NewWeaviateClient(cfg.vectorDB.host, cfg.vectorDB.addr)
+	weaviateClient, err := db.NewWeaviateClient(cfg.weaviateDB.host, cfg.weaviateDB.addr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	redisClient, err := db.NewWeaviateClient(cfg.vectorDB.host, cfg.vectorDB.addr)
+	redisClient, err := db.NewRedisClient(cfg.redisDB.host, cfg.redisDB.addr, cfg.redisDB.password)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	weaviateStore := store.NewWeaviateStorage(weaviateClient)
-	redisStore := store.RedisStorage(redisClient)
+	redisStore := store.NewRedisStorage(redisClient)
 	app := &application{
 		config:        cfg,
 		weaviateStore: weaviateStore,

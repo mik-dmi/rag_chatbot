@@ -17,14 +17,20 @@ type application struct {
 	redisStore    store.RedisStorage
 }
 type config struct {
-	addr     string
-	vectorDB vectorDBConfig
-	env      string
+	addr       string
+	weaviateDB weaviateDBConfig
+	redisDB    redisDBConfig
+	env        string
 }
 
-type vectorDBConfig struct {
+type weaviateDBConfig struct {
 	addr string
 	host string
+}
+type redisDBConfig struct {
+	addr     string
+	host     string
+	password string
 }
 
 func (app *application) mount() *http.ServeMux {

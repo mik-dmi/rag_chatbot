@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 
+	"github.com/redis/go-redis/v9"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
@@ -31,7 +32,7 @@ func NewWeaviateStorage(client *weaviate.Client) WeaviateStorage {
 	}
 }
 
-func NewRedisStorage(client *reddis.Client) RedisStorage {
+func NewRedisStorage(client *redis.Client) RedisStorage {
 	return RedisStorage{
 		ChatHistory: &ChatHistoryStore{client},
 	}

@@ -52,7 +52,7 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 
 	ctx := r.Context()
 
-	vectorsCreated, err := app.store.Vectors.CreateVectors(ctx, vector)
+	vectorsCreated, err := app.weaviateStore.Vectors.CreateVectors(ctx, vector)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -74,13 +74,13 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	result, err := app.store.Vectors.GetClosestVectors(ctx, query.UserMessage)
+	result, err := app.weaviateStore.Vectors.GetClosestVectors(ctx, query.UserMessage)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	var prompt = prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
+	prompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
 		promptTemplate,
 		prompts.NewHumanMessagePromptTemplate(
 			`CHAT HISTORY: {{.chat_history}}
@@ -89,6 +89,7 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 			[]string{"chat_history", "context", "question"},
 		),
 	})
+	fmt.Println(prompt)
 
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
@@ -113,7 +114,7 @@ func (app *application) getObjectIDByChapterHandler(w http.ResponseWriter, r *ht
 		return
 	}
 	ctx := r.Context()
-	objectIDRetrieved, err := app.store.Vectors.GetObjectIDByChapter(ctx, chapterName.ChapterName)
+	objectIDRetrieved, err := app.weaviateStore.Vectors.GetObjectIDByChapter(ctx, chapterName.ChapterName)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -130,7 +131,7 @@ func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *
 	fmt.Print(r.PathValue(id))
 
 	ctx := r.Context()
-	response, err := app.store.Vectors.DeleteObjectWithID(ctx, id)
+	response, err := app.weaviateStore.Vectors.DeleteObjectWithID(ctx, id)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
