@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	"github.com/tmc/langchaingo/prompts"
@@ -84,23 +85,43 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 		promptTemplate,
 		prompts.NewHumanMessagePromptTemplate(
 			`CHAT HISTORY: {{.chat_history}}
-	CONTEXT: {{.context}}
-	QUESTION: {{.question}}`,
+			CONTEXT: {{.context}}
+			QUESTION: {{.question}}`,
 			[]string{"chat_history", "context", "question"},
 		),
 	})
 	fmt.Println(prompt)
 
+	memory, err := app.redisStore.ChatHistory.CreateChatHistory(ctx)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	// Load chat history (if any)
+	memoryLoad, err := memory.LoadMemoryVariables(ctx, map[string]any{})
+	if err != nil {
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Normalize the user's question (if needed)
+	questionUser := strings.ReplaceAll(strings.TrimSpace(query.UserMessage), "\n", " ")
+
+	var finalQuestion string
+	//check if chat_history exists in
+	if chatHist, ok := memoryLoad["chat_history"].(string); ok && chatHist != "" {
+		// If there is chat history, create a standalone question based on history
+		//   ---> need to be done finalQuestion = StandaloneQuestion(memoryLoad, questionUser)
+	} else {
+		// if no chat history the user question will be used as the final
+		finalQuestion = questionUser
 	}
 
 	if err := writeJSON(w, http.StatusOK, result); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 }
 
 type GetChapterNameIDBody struct {
