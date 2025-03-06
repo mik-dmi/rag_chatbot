@@ -82,7 +82,7 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	prompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
-		promptTemplate,
+		promptFinalTemplate,
 		prompts.NewHumanMessagePromptTemplate(
 			`CHAT HISTORY: {{.chat_history}}
 			CONTEXT: {{.context}}
@@ -108,16 +108,21 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	// Normalize the user's question (if needed)
 	questionUser := strings.ReplaceAll(strings.TrimSpace(query.UserMessage), "\n", " ")
 
-	var finalQuestion string
 	//check if chat_history exists in
+	var finalQuestion string
 	if chatHist, ok := memoryLoad["chat_history"].(string); ok && chatHist != "" {
 		// If there is chat history, create a standalone question based on history
-		//   ---> need to be done finalQuestion = StandaloneQuestion(memoryLoad, questionUser)
+		finalQuestion, err = standaloneQuestion(memoryLoad, questionUser)
+		if err != nil {
+			writeJSONError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	} else {
 		// if no chat history the user question will be used as the final
 		finalQuestion = questionUser
 	}
 
+	fmt.Println(finalQuestion)
 	if err := writeJSON(w, http.StatusOK, result); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return

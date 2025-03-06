@@ -2,7 +2,7 @@ package main
 
 import "github.com/tmc/langchaingo/prompts"
 
-var promptTemplate = prompts.NewSystemMessagePromptTemplate(
+var promptFinalTemplate = prompts.NewSystemMessagePromptTemplate(
 	`Answer the question based solely on the CONTEXT below. You must follow ALL the rules listed when generating a response:
 
 You are a RAG chatbot designed to answer user questions about documentation stored in a vector database. The relevant information to answer the user's question will be in the CONTEXT (which is the data from the vector database most similar to the user's question) and/or in the provided CHAT HISTORY.
