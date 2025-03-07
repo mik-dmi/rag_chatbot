@@ -9,18 +9,26 @@ import (
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	"github.com/mik-dmi/rag_chatbot/backend/utils/middleware"
+	"github.com/tmc/langchaingo/llms/openai"
 )
 
 type application struct {
 	config        config
 	weaviateStore store.WeaviateStorage
 	redisStore    store.RedisStorage
+	openaiClient  *openai.LLM
 }
 type config struct {
 	addr       string
 	weaviateDB weaviateDBConfig
 	redisDB    redisDBConfig
 	env        string
+	openai     openaiConfig
+}
+
+type openaiConfig struct {
+	token string
+	model string
 }
 
 type weaviateDBConfig struct {

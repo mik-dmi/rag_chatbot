@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/db"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/llm"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 )
 
@@ -55,6 +56,10 @@ func main() {
 			host:     env.GetString("REDIS_DB_HOST", "localhost"),
 			password: env.GetString("REDIS_PASSWORD", "redis_password"),
 		},
+		openai: openaiConfig{
+			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
+			model: "gpt-4",
+		},
 
 		env: env.GetString("ENV", "development"),
 	}
@@ -69,12 +74,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	openaiClient, err := llm.NewOpenaiClient(cfg.openai.token, cfg.openai.model)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	weaviateStore := store.NewWeaviateStorage(weaviateClient)
 	redisStore := store.NewRedisStorage(redisClient)
 	app := &application{
 		config:        cfg,
 		weaviateStore: weaviateStore,
 		redisStore:    redisStore,
+		openaiClient:  openaiClient,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

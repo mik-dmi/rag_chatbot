@@ -82,7 +82,7 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	prompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
-		promptFinalTemplate,
+		finalPromptTemplate,
 		prompts.NewHumanMessagePromptTemplate(
 			`CHAT HISTORY: {{.chat_history}}
 			CONTEXT: {{.context}}
