@@ -56,7 +56,11 @@ func main() {
 			host:     env.GetString("REDIS_DB_HOST", "localhost"),
 			password: env.GetString("REDIS_PASSWORD", "redis_password"),
 		},
-		openai: openaiConfig{
+		standaloneLLMModel: llmConfig{
+			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
+			model: "gpt-4",
+		},
+		mainLLMModel: llmConfig{
 			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
 			model: "gpt-4",
 		},
@@ -74,7 +78,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	openaiClient, err := llm.NewOpenaiClient(cfg.openai.token, cfg.openai.model)
+	standaloneChainOpenaiClient, mainChainOpenaiClient, err := llm.NewOpenaiClient(cfg.standaloneLLMModel.token, cfg.mainLLMModel.token, cfg.standaloneLLMModel.model, cfg.mainLLMModel.model)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -85,7 +89,10 @@ func main() {
 		config:        cfg,
 		weaviateStore: weaviateStore,
 		redisStore:    redisStore,
-		openaiClient:  openaiClient,
+		openaiClients: OpenaiClients{
+			standaloneChainClient: standaloneChainOpenaiClient,
+			mainChainClient:       mainChainOpenaiClient,
+		},
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

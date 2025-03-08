@@ -16,17 +16,23 @@ type application struct {
 	config        config
 	weaviateStore store.WeaviateStorage
 	redisStore    store.RedisStorage
-	openaiClient  *openai.LLM
-}
-type config struct {
-	addr       string
-	weaviateDB weaviateDBConfig
-	redisDB    redisDBConfig
-	env        string
-	openai     openaiConfig
+	openaiClients OpenaiClients
 }
 
-type openaiConfig struct {
+type OpenaiClients struct {
+	standaloneChainClient *openai.LLM
+	mainChainClient       *openai.LLM
+}
+type config struct {
+	addr               string
+	weaviateDB         weaviateDBConfig
+	redisDB            redisDBConfig
+	env                string
+	standaloneLLMModel llmConfig
+	mainLLMModel       llmConfig
+}
+
+type llmConfig struct {
 	token string
 	model string
 }

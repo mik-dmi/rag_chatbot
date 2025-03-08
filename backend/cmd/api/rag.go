@@ -108,11 +108,11 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	// Normalize the user's question (if needed)
 	questionUser := strings.ReplaceAll(strings.TrimSpace(query.UserMessage), "\n", " ")
 
-	//check if chat_history exists in
+	//check if chat_history exists ins
 	var finalQuestion string
 	if chatHist, ok := memoryLoad["chat_history"].(string); ok && chatHist != "" {
 		// If there is chat history, create a standalone question based on history
-		finalQuestion, err = standaloneQuestion(memoryLoad, questionUser)
+		finalQuestion, err = app.standaloneQuestion(memoryLoad, questionUser)
 		if err != nil {
 			writeJSONError(w, http.StatusInternalServerError, err.Error())
 			return

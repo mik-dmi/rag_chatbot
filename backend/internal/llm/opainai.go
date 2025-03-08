@@ -4,17 +4,21 @@ import (
 	"github.com/tmc/langchaingo/llms/openai"
 )
 
-func NewOpenaiClient(token string, llmModel string) (*openai.LLM, error) {
+func NewOpenaiClient(standaloneChainLLMToken string, mainChainLLMToken string, standaloneChainLLMModel string, mainChainLLMModel string) (*openai.LLM, *openai.LLM, error) {
 
-	openaiClient, err := openai.New(
-		openai.WithToken(token),
-		openai.WithModel(llmModel),
+	standaloneChainOpenaiClient, err := openai.New(
+		openai.WithToken(standaloneChainLLMToken),
+		openai.WithModel(standaloneChainLLMModel),
+	)
+	mainChainOpenaiClient, err := openai.New(
+		openai.WithToken(mainChainLLMToken),
+		openai.WithModel(mainChainLLMModel),
 	)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return openaiClient, nil
+	return standaloneChainOpenaiClient, mainChainOpenaiClient, nil
 
 }
