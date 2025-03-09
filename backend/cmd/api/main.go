@@ -58,11 +58,11 @@ func main() {
 		},
 		standaloneLLMModel: llmConfig{
 			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
-			model: "gpt-4o",
+			model: "gpt-3.5-turbo",
 		},
 		mainLLMModel: llmConfig{
 			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
-			model: "gpt-4o",
+			model: "gpt-3.5-turbo",
 		},
 
 		env: env.GetString("ENV", "development"),

@@ -135,6 +135,12 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 		"context":      strings.Join(docs, "\n"),
 		"question":     questionUser,
 	}
+	formattedPrompt, err := finalPrompt.Format(input)
+	if err != nil {
+		log.Printf("Error formatting prompt: %v", err)
+	} else {
+		log.Printf("Final Rendered Prompt:\n%s", formattedPrompt)
+	}
 
 	finalRagAnswer, err := chains.Call(ctx, finalChain, input)
 	if err != nil {
