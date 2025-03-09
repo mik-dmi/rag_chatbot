@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
+	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/prompts"
 )
 
@@ -75,31 +78,27 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	result, err := app.weaviateStore.Vectors.GetClosestVectors(ctx, query.UserMessage)
+	similarDocs, err := app.weaviateStore.Vectors.GetClosestVectors(ctx, query.UserMessage)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
-	prompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
-		finalPromptTemplate,
-		prompts.NewHumanMessagePromptTemplate(
-			`CHAT HISTORY: {{.chat_history}}
-			CONTEXT: {{.context}}
-			QUESTION: {{.question}}`,
-			[]string{"chat_history", "context", "question"},
-		),
-	})
-	fmt.Println(prompt)
-
-	memory, err := app.redisStore.ChatHistory.CreateChatHistory(ctx)
-	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
-		return
+	// put all the docs in a array of string
+	// may in ht future change the GetClosestVectors return value
+	var docs []string
+	for _, doc := range similarDocs {
+		jsonData, err := json.Marshal(doc)
+		if err != nil {
+			log.Printf("Error marshaling document: %v", err)
+			continue
+		}
+		docs = append(docs, string(jsonData))
 	}
 
-	// Load chat history (if any)
-	memoryLoad, err := memory.LoadMemoryVariables(ctx, map[string]any{})
+	// it will be changed in the future
+	uniqueUserID := r.Header.Get("X-User-ID")
+
+	memory, err := app.redisStore.ChatHistory.GetChatHistory(ctx, uniqueUserID)
 	if err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -108,22 +107,43 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	// Normalize the user's question (if needed)
 	questionUser := strings.ReplaceAll(strings.TrimSpace(query.UserMessage), "\n", " ")
 
-	//check if chat_history exists ins
-	var finalQuestion string
-	if chatHist, ok := memoryLoad["chat_history"].(string); ok && chatHist != "" {
+	//check if chat_history exists in redis, if it does the users question and history are to make a standalone question
+	if chatHist, ok := memory["chat_history"].(string); ok && chatHist != "" {
 		// If there is chat history, create a standalone question based on history
-		finalQuestion, err = app.standaloneQuestion(memoryLoad, questionUser)
+		questionUser, err = app.standaloneQuestion(memory, questionUser)
 		if err != nil {
 			writeJSONError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-	} else {
-		// if no chat history the user question will be used as the final
-		finalQuestion = questionUser
 	}
 
-	fmt.Println(finalQuestion)
-	if err := writeJSON(w, http.StatusOK, result); err != nil {
+	log.Println("Question used for the main chain ", questionUser)
+
+	finalPrompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
+		finalPromptTemplate,
+		prompts.NewHumanMessagePromptTemplate(
+			`CHAT HISTORY: {{.chat_history}}
+			CONTEXT: {{.context}}
+			Question:{{.question}}`,
+			[]string{"chat_history", "context", "question"},
+		)})
+
+	finalChain := chains.NewLLMChain(app.openaiClients.mainChainClient, finalPrompt)
+
+	input := map[string]any{
+		"chat_history": memory["chat_history"],
+		"context":      strings.Join(docs, "\n"),
+		"question":     questionUser,
+	}
+
+	finalRagAnswer, err := chains.Call(ctx, finalChain, input)
+	if err != nil {
+		if err != nil {
+			writeJSONError(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+	if err := writeJSON(w, http.StatusOK, finalRagAnswer); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

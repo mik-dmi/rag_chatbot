@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/redis/go-redis/v9"
-	"github.com/tmc/langchaingo/memory"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 )
 
@@ -21,9 +20,8 @@ type WeaviateStorage struct {
 }
 type RedisStorage struct {
 	ChatHistory interface {
-		CreateChatHistory(context.Context) (*memory.ConversationWindowBuffer, error)
+		GetChatHistory(context.Context, string) (map[string]any, error)
 		PostChatData(context.Context) error
-		GetChatHistory(context.Context) error
 	}
 }
 

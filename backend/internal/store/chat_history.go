@@ -24,23 +24,25 @@ type ChatHistoryStore struct {
 	client *redis.Client
 }
 
-func (c *ChatHistoryStore) CreateChatHistory(ctx context.Context) (*memory.ConversationWindowBuffer, error) {
-	// Create a conversation buffer with 4 slots
-	memory := memory.NewConversationWindowBuffer(4, func(b *memory.ConversationBuffer) {
-		chatHistory, err := redis_chat_history.New(c.client.ClientID(ctx).String(), 300, c.client)
-		if err != nil {
-			// Handle error appropriately (you may choose to log or propagate this error)
-		}
+// gets User Chat History if exists
+func (c *ChatHistoryStore) GetChatHistory(ctx context.Context, clientID string) (map[string]any, error) {
+	chatHistory, err := redis_chat_history.New(clientID, 300, c.client)
+	if err != nil {
+		return nil, err
+	}
+	// memory buffer only has 4 slots
+	memoryBuffer := memory.NewConversationWindowBuffer(4, func(b *memory.ConversationBuffer) {
 		b.ChatHistory = chatHistory
 	})
 
-	return memory, nil
+	memoryLoad, err := memoryBuffer.LoadMemoryVariables(ctx, map[string]any{})
+	if err != nil {
+		return nil, err
+	}
+
+	return memoryLoad, nil
 }
 
 func (client *ChatHistoryStore) PostChatData(ctx context.Context) error {
-	return nil
-}
-
-func (client *ChatHistoryStore) GetChatHistory(ctx context.Context) error {
 	return nil
 }

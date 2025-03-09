@@ -1,13 +1,13 @@
 package main
 
 import (
-	"log"
+	"context"
 
 	"github.com/tmc/langchaingo/chains"
 	"github.com/tmc/langchaingo/prompts"
 )
 
-func (app *application) standaloneChain(memoryLoad map[string]any, questionUser string) (*chains.LLMChain, error) {
+func (app *application) standaloneQuestion(memoryLoad map[string]any, questionUser string) (string, error) {
 
 	standalonePrompt := prompts.NewChatPromptTemplate([]prompts.MessageFormatter{
 		standalonePromptTemplate,
@@ -20,9 +20,16 @@ func (app *application) standaloneChain(memoryLoad map[string]any, questionUser 
 
 	standaloneChain := chains.NewLLMChain(app.openaiClients.standaloneChainClient, standalonePrompt)
 
-	standaloneChain.OutputKey
-	log.Println("Standalond prompt: ", standalonePrompt)
+	input := map[string]any{
+		"chat_history": memoryLoad["chat_history"],
+		"question":     questionUser,
+	}
 
-	return "", nil
+	res, err := chains.Run(context.Background(), standaloneChain, input)
+	if err != nil {
+		return "", nil
+	}
+
+	return res, nil
 
 }
