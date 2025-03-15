@@ -144,11 +144,10 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 
 	finalRagAnswer, err := chains.Call(ctx, finalChain, input)
 	if err != nil {
-		if err != nil {
-			writeJSONError(w, http.StatusInternalServerError, err.Error())
-			return
-		}
+		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		return
 	}
+
 	if err := writeJSON(w, http.StatusOK, finalRagAnswer); err != nil {
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -175,7 +174,6 @@ func (app *application) getObjectIDByChapterHandler(w http.ResponseWriter, r *ht
 		writeJSONError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-
 }
 
 func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *http.Request) {

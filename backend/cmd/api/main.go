@@ -8,6 +8,8 @@ import (
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/llm"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
+	lg "github.com/mik-dmi/rag_chatbot/backend/utils/logger"
+	"go.uber.org/zap"
 )
 
 /*
@@ -67,6 +69,19 @@ func main() {
 
 		env: env.GetString("ENV", "development"),
 	}
+	var logger *zap.SugaredLogger
+
+	if env.GetString(cfg.env, "development") == "production" {
+		logger, err = lg.NewProductionLogger()
+		if err != nil {
+			log.Fatalf("Failed to initialize logger: %s", err)
+		}
+	} else {
+		logger, err = lg.NewDevelopmentLogger()
+		if err != nil {
+			log.Fatalf("Failed to initialize logger: %s", err)
+		}
+	}
 
 	weaviateClient, err := db.NewWeaviateClient(cfg.weaviateDB.host, cfg.weaviateDB.addr)
 	if err != nil {
@@ -93,6 +108,7 @@ func main() {
 			standaloneChainClient: standaloneChainOpenaiClient,
 			mainChainClient:       mainChainOpenaiClient,
 		},
+		logger: logger,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

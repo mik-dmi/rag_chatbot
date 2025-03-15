@@ -19,6 +19,10 @@ type RagData struct {
 	CreatedAt string     `json:"created_at"`
 	UpdatedAt string     `json:"updated_at"`
 }
+
+
+
+
 type Document struct {
 	Chapter     string       `json:"chapter"`
 	Subsections []Subsection `json:"subsections"`
@@ -27,6 +31,13 @@ type Subsection struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
+
+
+
+
+
+
+
 type VectorsStore struct {
 	client *weaviate.Client
 }

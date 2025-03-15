@@ -10,6 +10,7 @@ import (
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	"github.com/mik-dmi/rag_chatbot/backend/utils/middleware"
 	"github.com/tmc/langchaingo/llms/openai"
+	"go.uber.org/zap"
 )
 
 type application struct {
@@ -17,6 +18,7 @@ type application struct {
 	weaviateStore store.WeaviateStorage
 	redisStore    store.RedisStorage
 	openaiClients OpenaiClients
+	logger        *zap.SugaredLogger
 }
 
 type OpenaiClients struct {
