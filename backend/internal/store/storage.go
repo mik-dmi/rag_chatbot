@@ -3,14 +3,20 @@ package store
 import (
 	"context"
 
+	"errors"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
+)
+
+var (
+	ErrNotFound = errors.New("vector not found")
 )
 
 type WeaviateStorage struct {
 	Vectors interface {
 		CreateVectors(context.Context, *RagData) (*VectorCreatedResponse, error)
-		GetClosestVectors(context.Context, string) ([]Document, error)
+		GetClosestVectors(context.Context, string) ([]*Document, error)
 
 		chapterExists(context.Context, string) (bool, error)
 		GetObjectIDByChapter(context.Context, string) (*IDResponse, error)

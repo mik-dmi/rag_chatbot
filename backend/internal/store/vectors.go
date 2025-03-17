@@ -20,9 +20,6 @@ type RagData struct {
 	UpdatedAt string     `json:"updated_at"`
 }
 
-
-
-
 type Document struct {
 	Chapter     string       `json:"chapter"`
 	Subsections []Subsection `json:"subsections"`
@@ -31,12 +28,6 @@ type Subsection struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 }
-
-
-
-
-
-
 
 type VectorsStore struct {
 	client *weaviate.Client
@@ -120,7 +111,7 @@ func (d *VectorsStore) CreateVectors(ctx context.Context, data *RagData) (*Vecto
 	return &jsonChapters, nil
 }
 
-func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]Document, error) {
+func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]*Document, error) {
 	maxDistance := float32(0.5) //max similarity threshold
 	graphQLResponse, err := d.client.GraphQL().Get().
 		WithClassName("Book").
@@ -218,7 +209,7 @@ func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string
 		WithID(idToDelete).
 		Do(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("%sretrieving object with id %s", err.Error(), idToDelete)
+		return nil, fmt.Errorf("%s retrieving object with id %s", err.Error(), idToDelete)
 	}
 	if obj == nil {
 		return nil, fmt.Errorf("object with id %s does not exist", idToDelete)
@@ -249,7 +240,7 @@ func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapter
 		return nil, fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
 	}
 	if !ok {
-		return nil, fmt.Errorf("error can not delete chapter, chapter %s does not exits", chapterName)
+		return nil, fmt.Errorf("error can not delete chapter, chapter %s does not exits: %w", chapterName, ErrNotFound)
 	}
 	result, err := d.client.Batch().
 		ObjectsBatchDeleter().
@@ -276,7 +267,7 @@ func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapter
 	return response, nil
 }
 
-func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, error) {
+func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]*Document, error) {
 	if len(res.Errors) > 0 {
 		messages := make([]string, 0, len(res.Errors))
 		for _, e := range res.Errors {
@@ -292,7 +283,7 @@ func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, e
 
 	rawBooks, ok := getData["Book"].([]any)
 	if !ok || len(rawBooks) == 0 {
-		return nil, fmt.Errorf("no Book data found")
+		return nil, ErrNotFound
 	}
 
 	// Group results by chapter.
@@ -344,9 +335,9 @@ func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]Document, e
 		}
 	}
 
-	documents := make([]Document, 0, len(chapterMap))
+	documents := make([]*Document, 0, len(chapterMap))
 	for _, doc := range chapterMap {
-		documents = append(documents, *doc)
+		documents = append(documents, doc)
 	}
 
 	return documents, nil

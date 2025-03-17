@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -24,7 +25,7 @@ type UserQuery struct {
 func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Request) {
 	var documents CreateDocumentsPayload
 	if err := readJSON(w, r, &documents); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err.Error())
+		app.badRequestError(w, r, err)
 		return
 	}
 
@@ -58,12 +59,12 @@ func (app *application) createVectorHandler(w http.ResponseWriter, r *http.Reque
 
 	vectorsCreated, err := app.weaviateStore.Vectors.CreateVectors(ctx, vector)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 
 	if err := writeJSON(w, http.StatusCreated, vectorsCreated); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 
@@ -74,13 +75,18 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 	var query UserQuery
 
 	if err := readJSON(w, r, &query); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err.Error())
+		app.badRequestError(w, r, err)
 		return
 	}
 
 	similarDocs, err := app.weaviateStore.Vectors.GetClosestVectors(ctx, query.UserMessage)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
 		return
 	}
 	// put all the docs in a array of string
@@ -100,7 +106,7 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 
 	memory, err := app.redisStore.ChatHistory.GetChatHistory(ctx, uniqueUserID)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 
@@ -112,7 +118,7 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 		// If there is chat history, create a standalone question based on history
 		questionUser, err = app.standaloneQuestion(memory, questionUser)
 		if err != nil {
-			writeJSONError(w, http.StatusInternalServerError, err.Error())
+			app.internalServerError(w, r, err)
 			return
 		}
 	}
@@ -144,12 +150,12 @@ func (app *application) userQuestionHandler(w http.ResponseWriter, r *http.Reque
 
 	finalRagAnswer, err := chains.Call(ctx, finalChain, input)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 
 	if err := writeJSON(w, http.StatusOK, finalRagAnswer); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 }
@@ -161,17 +167,17 @@ type GetChapterNameIDBody struct {
 func (app *application) getObjectIDByChapterHandler(w http.ResponseWriter, r *http.Request) {
 	var chapterName GetChapterNameIDBody
 	if err := readJSON(w, r, &chapterName); err != nil {
-		writeJSONError(w, http.StatusBadRequest, err.Error())
+		app.badRequestError(w, r, err)
 		return
 	}
 	ctx := r.Context()
 	objectIDRetrieved, err := app.weaviateStore.Vectors.GetObjectIDByChapter(ctx, chapterName.ChapterName)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 	if err := writeJSON(w, http.StatusOK, objectIDRetrieved); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 }
@@ -183,12 +189,18 @@ func (app *application) deleteVectorObjectByIdHandler(w http.ResponseWriter, r *
 	ctx := r.Context()
 	response, err := app.weaviateStore.Vectors.DeleteObjectWithID(ctx, id)
 	if err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+
+		}
 		return
 	}
 
 	if err := writeJSON(w, http.StatusOK, response); err != nil {
-		writeJSONError(w, http.StatusInternalServerError, err.Error())
+		app.internalServerError(w, r, err)
 		return
 	}
 }
