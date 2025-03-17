@@ -24,4 +24,4 @@ This RAG system is implemented as a RESTful API, allowing users to update the ve
 ## Project Overview  
 Below is a diagram providing a simplified overview of the entire API and RAG system, which helps explain how everything works.
 
-![RAG API Diagram](./public/rag_diagram.png)
+![RAG API Diagram](./public/rag_chatbot.png)
