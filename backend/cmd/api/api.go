@@ -20,7 +20,6 @@ type application struct {
 	openaiClients OpenaiClients
 	logger        *zap.SugaredLogger
 }
-
 type OpenaiClients struct {
 	standaloneChainClient *openai.LLM
 	mainChainClient       *openai.LLM
@@ -33,12 +32,10 @@ type config struct {
 	standaloneLLMModel llmConfig
 	mainLLMModel       llmConfig
 }
-
 type llmConfig struct {
 	token string
 	model string
 }
-
 type weaviateDBConfig struct {
 	addr string
 	host string
@@ -56,6 +53,7 @@ func (app *application) mount() *http.ServeMux {
 	router.HandleFunc("POST /vector-db", app.createVectorHandler)
 	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
 	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
+	router.HandleFunc("PATCH /vector-db/object/{id}", app.updateVectorObjectByIdHandler)
 
 	v1 := http.NewServeMux()
 	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting

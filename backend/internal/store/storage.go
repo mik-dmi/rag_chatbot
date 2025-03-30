@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("vector not found")
+	ErrNotFound             = errors.New("vector not found")
+	ErrChapterAlreadyExists = errors.New("already exists in weaviate")
 )
 
 type WeaviateStorage struct {
@@ -20,8 +21,9 @@ type WeaviateStorage struct {
 
 		chapterExists(context.Context, string) (bool, error)
 		GetObjectIDByChapter(context.Context, string) (*IDResponse, error)
-		DeleteChapterWithChapterName(context.Context, string) (*SuccessfullyDeleted, error)
-		DeleteObjectWithID(context.Context, string) (*SuccessfullyDeleted, error)
+		DeleteChapterWithChapterName(context.Context, string) (*SuccessfullyAPIOperation, error)
+		DeleteObjectWithID(context.Context, string) (*SuccessfullyAPIOperation, error)
+		UpdateObjectWithID(context.Context, Document, string) (*SuccessfullyAPIOperation, error)
 	}
 }
 type RedisStorage struct {

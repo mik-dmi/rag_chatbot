@@ -1,0 +1,408 @@
+2025-03-29T23:57:43.096Z	ERROR	api/errors.go:6	internal server error: error chapter O Barilas e as suas atividades fisicas already exits in weaviate
+main.(*application).internalServerError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:6
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:65
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:10:21.804Z	ERROR	api/errors.go:11	bad request error: error chapter O Barilas e as suas atividades fisicas already exits in weaviate: chapter already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:11:29.935Z	ERROR	api/errors.go:11	bad request error: error O Barilas e as suas atividades fisicas chapter already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:17.107Z	ERROR	api/errors.go:11	bad request error: Key: 'CreateDocumentsPayload.UserID' Error:Field validation for 'UserID' failed on the 'required' tag
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:33
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:17.113Z	ERROR	api/errors.go:11	bad request error: error O Barilas e as suas atividades fisicas already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:27.930Z	ERROR	api/errors.go:11	bad request error: error O Barilas e as suas atividades fisicas already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:38.780Z	ERROR	api/errors.go:11	bad request error: invalid character '}' looking for beginning of object key string
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:28
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:46.081Z	ERROR	api/errors.go:11	bad request error: Key: 'CreateDocumentsPayload.Documents' Error:Field validation for 'Documents' failed on the 'required' tag
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:33
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:46.087Z	ERROR	api/errors.go:6	internal server error: batch insert failed: status code: 422, error: {"error":[{"message":"invalid param 'objects': cannot be empty, need at least one object for batching"}]}
+
+main.(*application).internalServerError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:6
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:70
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:12:52.422Z	ERROR	api/errors.go:11	bad request error: error O Barilas e as suas atividades fisicas already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:13:09.687Z	ERROR	api/errors.go:6	internal server error: error checking if a chapter already exits in weaviate: status code: -1, error: check the DerivedFromError field for more information: status code: -1, error: check the DerivedFromError field for more information: Post "http://localhost:8080/v1/graphql": dial tcp 127.0.0.1:8080: connect: connection refused
+main.(*application).internalServerError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:6
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:70
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:13:16.690Z	ERROR	api/errors.go:6	internal server error: error checking if a chapter already exits in weaviate: status code: -1, error: check the DerivedFromError field for more information: status code: -1, error: check the DerivedFromError field for more information: Post "http://localhost:8080/v1/graphql": EOF
+main.(*application).internalServerError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:6
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:70
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T00:15:22.648Z	ERROR	api/errors.go:11	bad request error: error: chapter O Barilas e as suas atividades fisicas already exists in weaviate
+main.(*application).badRequestError
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/errors.go:11
+main.(*application).createVectorHandler
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/cmd/api/rag.go:68
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+main.(*application).mount.StripPrefix.func1
+	/usr/local/go/src/net/http/server.go:2214
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.(*ServeMux).ServeHTTP
+	/usr/local/go/src/net/http/server.go:2688
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Logging.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:30
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+github.com/mik-dmi/rag_chatbot/backend/utils/middleware.Recovery.func1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:54
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+main.(*application).Run.Timeout.func1.1
+	/home/mike_the_dev/golang_projects/rag_chatbot/backend/utils/middleware/middleware.go:84
+net/http.HandlerFunc.ServeHTTP
+	/usr/local/go/src/net/http/server.go:2171
+net/http.serverHandler.ServeHTTP
+	/usr/local/go/src/net/http/server.go:3142
+net/http.(*conn).serve
+	/usr/local/go/src/net/http/server.go:2044
+2025-03-30T12:39:54.431+0100	DEBUG	api/rag.go:113	Question used for the main chain  Tell me about the Chapter: The Go programming language
+2025-03-30T12:40:46.760+0100	DEBUG	api/rag.go:113	Question used for the main chain  Tell me about the Chapter: the first test chapter
+2025-03-30T16:25:11.737+0100	DEBUG	api/rag.go:97	Question used for the main chain  Tell me about the Chapter: the first test chapter
+2025-03-30T16:25:41.030+0100	DEBUG	api/rag.go:97	Question used for the main chain  Tell me about the Chapter: the first test chapter

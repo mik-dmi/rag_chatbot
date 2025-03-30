@@ -10,7 +10,7 @@ import (
 var Validate *validator.Validate
 
 func init() {
-	Validate = v
+	Validate = validator.New(validator.WithRequiredStructEnabled())
 }
 func writeJSON(w http.ResponseWriter, status int, data any) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -35,4 +35,11 @@ func writeJSONError(w http.ResponseWriter, status int, message string) error {
 	}
 
 	return writeJSON(w, status, &envelope{Error: message})
+}
+
+func (app *application) jsonResponse(w http.ResponseWriter, status int, data any) error {
+	type envolope struct {
+		Data any `json:"data"`
+	}
+	return writeJSON(w, status, &envolope{Data: data})
 }

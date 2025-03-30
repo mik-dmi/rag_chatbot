@@ -15,11 +15,13 @@ func NewProductionLogger() (*zap.SugaredLogger, error) {
 
 func NewDevelopmentLogger() (*zap.SugaredLogger, error) {
 	devConfig := zap.NewDevelopmentConfig()
+
 	// Write development logs to both stdout and a dedicated development log file.
 	devConfig.OutputPaths = []string{"stdout", "developmentlogfile.log"}
 	logger, err := devConfig.Build()
 	if err != nil {
 		return nil, err
 	}
+
 	return logger.Sugar(), nil
 }

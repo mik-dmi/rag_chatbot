@@ -59,7 +59,7 @@ type IDResponse struct {
 	Id string `json:"id"`
 }
 
-type SuccessfullyDeleted struct {
+type SuccessfullyAPIOperation struct {
 	Message string `json:"message"`
 }
 
@@ -74,10 +74,10 @@ func (d *VectorsStore) CreateVectors(ctx context.Context, data *RagData) (*Vecto
 		if err != nil {
 			return nil, fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
 		}
-		// if the ok  is false than the chapter
+		// if the ok is true than the chapter exits
 		if ok {
 			log.Printf("chapter: %s already exists in weaviate", doc.Chapter)
-			return nil, fmt.Errorf("error chapter %s already exits in weaviate", doc.Chapter)
+			return nil, fmt.Errorf("error: chapter %s %w", doc.Chapter, ErrChapterAlreadyExists)
 		}
 
 		var subs []Subsection
@@ -203,7 +203,7 @@ func (d *VectorsStore) GetObjectIDByChapter(ctx context.Context, query string) (
 	return nil, fmt.Errorf("no object found for chapter: %s", query)
 }
 
-func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string) (*SuccessfullyDeleted, error) {
+func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string) (*SuccessfullyAPIOperation, error) {
 	obj, err := d.client.Data().ObjectsGetter().
 		WithClassName("Book").
 		WithID(idToDelete).
@@ -225,15 +225,45 @@ func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string
 		return nil, fmt.Errorf("error deleting object with id %s: %w", idToDelete, err)
 	}
 
-	response := &SuccessfullyDeleted{
+	response := &SuccessfullyAPIOperation{
 		Message: "Object deleted successfully ",
 	}
 
 	return response, nil
 }
 
+func (d *VectorsStore) UpdateObjectWithID(ctx context.Context, updatedDocuments Document, idToUpdate string) (*SuccessfullyAPIOperation, error) {
+	obj, err := d.client.Data().ObjectsGetter().
+		WithClassName("Book").
+		WithID(idToUpdate).
+		Do(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s retrieving object with id %s", err.Error(), idToUpdate)
+	}
+	if obj == nil {
+		return nil, fmt.Errorf("error updating object with id %s, it does not exist: %w", idToUpdate, ErrNotFound)
+	}
+
+	err = d.client.Data().
+		Updater().
+		WithClassName("Book").
+		WithID(idToUpdate).
+		WithProperties(updatedDocuments).
+		Do(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("error updating object with id %s: %w", idToUpdate, err)
+	}
+
+	response := &SuccessfullyAPIOperation{
+		Message: "Object updated successfully",
+	}
+
+	return response, nil
+}
+
 // there is no endpoint for this action in the api
-func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapterName string) (*SuccessfullyDeleted, error) {
+func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapterName string) (*SuccessfullyAPIOperation, error) {
 
 	ok, err := d.chapterExists(ctx, chapterName)
 	if err != nil {
@@ -260,7 +290,7 @@ func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapter
 
 	fmt.Print(result)
 
-	response := &SuccessfullyDeleted{
+	response := &SuccessfullyAPIOperation{
 		Message: *result.Output,
 	}
 
