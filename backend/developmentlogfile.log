@@ -406,3 +406,4 @@ net/http.(*conn).serve
 2025-03-30T12:40:46.760+0100	DEBUG	api/rag.go:113	Question used for the main chain  Tell me about the Chapter: the first test chapter
 2025-03-30T16:25:11.737+0100	DEBUG	api/rag.go:97	Question used for the main chain  Tell me about the Chapter: the first test chapter
 2025-03-30T16:25:41.030+0100	DEBUG	api/rag.go:97	Question used for the main chain  Tell me about the Chapter: the first test chapter
+2025-03-30T18:38:49.936+0100	DEBUG	api/rag.go:97	Question used for the main chain  Tell me about the Chapter: the first test chapter

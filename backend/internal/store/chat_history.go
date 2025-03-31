@@ -14,7 +14,7 @@ type Message struct {
 	IsUserMessage string `json:"is_user_message"`
 }
 
-type User struct {
+type RedisUser struct {
 	UserID      string    `json:"user_id"`
 	ChatHistory []Message `json:"chat_history"`
 	IP          string    `json:"ip"`
@@ -26,6 +26,10 @@ type ChatHistoryStore struct {
 
 // gets User Chat History if exists
 func (c *ChatHistoryStore) GetChatHistory(ctx context.Context, clientID string) (map[string]any, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	chatHistory, err := redis_chat_history.New(clientID, 300, c.client)
 	if err != nil {
 		return nil, err

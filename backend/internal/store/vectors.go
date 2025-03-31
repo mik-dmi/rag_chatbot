@@ -68,6 +68,8 @@ func (d *VectorsStore) CreateVectors(ctx context.Context, data *RagData) (*Vecto
 	var chaptersCreated []string
 
 	// Check if Chapter of data already exists
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 
 	for _, doc := range data.Documents {
 		ok, err := d.chapterExists(ctx, doc.Chapter)
@@ -113,6 +115,9 @@ func (d *VectorsStore) CreateVectors(ctx context.Context, data *RagData) (*Vecto
 
 func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]*Document, error) {
 	maxDistance := float32(0.5) //max similarity threshold
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 	graphQLResponse, err := d.client.GraphQL().Get().
 		WithClassName("Book").
 		WithFields(
@@ -156,7 +161,8 @@ func (d *VectorsStore) GetClosestVectors(ctx context.Context, query string) ([]*
 }
 
 func (d *VectorsStore) GetObjectIDByChapter(ctx context.Context, query string) (*IDResponse, error) {
-
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 	result, err := d.client.GraphQL().Get().
 		WithClassName("Book").
 		WithWhere(
@@ -204,6 +210,9 @@ func (d *VectorsStore) GetObjectIDByChapter(ctx context.Context, query string) (
 }
 
 func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string) (*SuccessfullyAPIOperation, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 	obj, err := d.client.Data().ObjectsGetter().
 		WithClassName("Book").
 		WithID(idToDelete).
@@ -233,6 +242,9 @@ func (d *VectorsStore) DeleteObjectWithID(ctx context.Context, idToDelete string
 }
 
 func (d *VectorsStore) UpdateObjectWithID(ctx context.Context, updatedDocuments Document, idToUpdate string) (*SuccessfullyAPIOperation, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 	obj, err := d.client.Data().ObjectsGetter().
 		WithClassName("Book").
 		WithID(idToUpdate).
@@ -265,6 +277,8 @@ func (d *VectorsStore) UpdateObjectWithID(ctx context.Context, updatedDocuments 
 // there is no endpoint for this action in the api
 func (d *VectorsStore) DeleteChapterWithChapterName(ctx context.Context, chapterName string) (*SuccessfullyAPIOperation, error) {
 
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
 	ok, err := d.chapterExists(ctx, chapterName)
 	if err != nil {
 		return nil, fmt.Errorf("error checking if a chapter already exits in weaviate: %w", err)
@@ -375,6 +389,10 @@ func parserGraphQLResponseToResponse(res *models.GraphQLResponse) ([]*Document, 
 
 // false = chapter not found / true = chapter found
 func (d *VectorsStore) chapterExists(ctx context.Context, chapter string) (bool, error) {
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	response, err := d.client.GraphQL().Get().
 		WithClassName("Book").
 		WithFields(graphql.Field{Name: "chapter"}).

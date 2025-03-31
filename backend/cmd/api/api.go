@@ -17,6 +17,7 @@ type application struct {
 	config        config
 	weaviateStore store.WeaviateStorage
 	redisStore    store.RedisStorage
+	postgreStore  store.PostgreStorage
 	openaiClients OpenaiClients
 	logger        *zap.SugaredLogger
 }
@@ -54,6 +55,8 @@ func (app *application) mount() *http.ServeMux {
 	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
 	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
 	router.HandleFunc("PATCH /vector-db/object/{id}", app.updateVectorObjectByIdHandler)
+
+	router.HandleFunc("GET /{userId}", app.getUserHandler)
 
 	v1 := http.NewServeMux()
 	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting
