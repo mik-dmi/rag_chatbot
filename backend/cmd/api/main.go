@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/db"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/llm"
@@ -58,6 +59,12 @@ func main() {
 			host:     env.GetString("REDIS_DB_HOST", "localhost"),
 			password: env.GetString("REDIS_PASSWORD", "redis_password"),
 		},
+		postgresDB: postgresDBConfig{
+			addr:         env.GetString("POSTGRES_ADDR", "postgres://admin:adminpassword@localhost:5492/postgres_rag?sslmode=disable"),
+			maxOpenConns: env.GetInt("POSTGRES_MAX_OPEN_CONNS", 30),
+			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
+			maxIdleTime:  env.GetString("DB_MAX_IDLE_CONNS", "15m"),
+		},
 		standaloneLLMModel: llmConfig{
 			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
 			model: "gpt-3.5-turbo",
@@ -92,6 +99,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	postgreClient, err := db.NewPostgreClient(cfg.postgresDB.addr, cfg.postgresDB.maxOpenConns, cfg.postgresDB.maxIdleConns, cfg.postgresDB.maxIdleTime)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	standaloneChainOpenaiClient, mainChainOpenaiClient, err := llm.NewOpenaiClient(cfg.standaloneLLMModel.token, cfg.mainLLMModel.token, cfg.standaloneLLMModel.model, cfg.mainLLMModel.model)
 	if err != nil {
@@ -100,10 +111,12 @@ func main() {
 
 	weaviateStore := store.NewWeaviateStorage(weaviateClient)
 	redisStore := store.NewRedisStorage(redisClient)
+	postgreStore := store.NewPostgreStorage(postgreClient)
 	app := &application{
 		config:        cfg,
 		weaviateStore: weaviateStore,
 		redisStore:    redisStore,
+		postgreStore:  postgreStore,
 		openaiClients: OpenaiClients{
 			standaloneChainClient: standaloneChainOpenaiClient,
 			mainChainClient:       mainChainOpenaiClient,

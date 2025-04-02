@@ -29,6 +29,7 @@ type config struct {
 	addr               string
 	weaviateDB         weaviateDBConfig
 	redisDB            redisDBConfig
+	postgresDB         postgresDBConfig
 	env                string
 	standaloneLLMModel llmConfig
 	mainLLMModel       llmConfig
@@ -40,6 +41,13 @@ type llmConfig struct {
 type weaviateDBConfig struct {
 	addr string
 	host string
+}
+
+type postgresDBConfig struct {
+	addr         string
+	maxOpenConns int
+	maxIdleConns int
+	maxIdleTime  string
 }
 type redisDBConfig struct {
 	addr     string
