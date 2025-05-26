@@ -74,7 +74,7 @@ func NewPostgreClient(addr string, maxOpenConns, maxIdleConns int, maxIdleTime s
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Connecting to:", addr)
+	//fmt.Println("Connecting to:", addr)
 
 	db.SetMaxOpenConns(maxOpenConns)
 	db.SetMaxIdleConns(maxIdleConns)
@@ -88,12 +88,12 @@ func NewPostgreClient(addr string, maxOpenConns, maxIdleConns int, maxIdleTime s
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	fmt.Println("herree")
+
 	if err = db.PingContext(ctx); err != nil {
 		fmt.Println("PingContext error:", err)
 		return nil, err
 	}
-	fmt.Println("herree1")
+
 	fmt.Println("Postgre is running at:", addr)
 
 	return db, nil

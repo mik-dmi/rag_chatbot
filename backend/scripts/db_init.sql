@@ -1,0 +1,2 @@
+CREATE EXTENSION IF NOT EXISTS citext; 
+CREATE DATABASE postgres_rag;
