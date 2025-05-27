@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	_ "github.com/lib/pq"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate/entities/models"

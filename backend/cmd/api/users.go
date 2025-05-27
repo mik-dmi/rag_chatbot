@@ -9,6 +9,10 @@ import (
 func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	userId := r.PathValue("userId")
+	//validate the user input
+	if err := Validate.Struct(userId); err != nil {
+		app.badRequestError(w, r, err)
+	}
 
 	ctx := r.Context()
 	user, err := app.postgreStore.Users.GetUserById(ctx, userId)

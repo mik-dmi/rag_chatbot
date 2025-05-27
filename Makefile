@@ -16,3 +16,7 @@ migrate-up:
 .PHONY: migrate-down
 migrate-down:
 	@migrate -path=$(MIGRATIONS_PATH) -database=$(POSTGRES_ADDR) down $(filter-out $@,$(MAKECMDGOALS))
+
+.PHONY: seed
+seed:
+	@go run backend/cmd/migrate/seed/main.go

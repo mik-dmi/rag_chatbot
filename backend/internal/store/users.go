@@ -9,10 +9,10 @@ type UsersStore struct {
 	client *sql.DB
 }
 type PostgreUser struct {
-	Username  string `json:"username"`
-	Password  string `json:"-"`
-	Email     string `json:"email"`
 	UserID    string `json:"user_id"`
+	Username  string `json:"username"`
+	Email     string `json:"email"`
+	Password  string `json:"-"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -23,7 +23,12 @@ type password struct {
 
 func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUser, error) {
 	query := `
-	SELECT id, username, email , password , created_at * FROM users WHERE id= $1 
+	SELECT   id,
+        username,
+        email,
+        password,
+        created_at,
+        updated_at * FROM users WHERE id= $1 
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
@@ -33,11 +38,12 @@ func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUs
 		query,
 		userId,
 	).Scan(
-		&user.Name,
-		&user.Password,
-		&user.Email,
 		&user.UserID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
 		&user.CreatedAt,
+		&user.UpdatedAt,
 	)
 	if err != nil {
 		switch err {
@@ -52,20 +58,23 @@ func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUs
 }
 
 func (s *UsersStore) CreateUser(ctx context.Context, user *PostgreUser) error {
-	query := `
-	INSERT INTO users (name, password , email) VALUES($1,$2,$3) RETURNING id, created_at
-	`
+	const query = `
+    INSERT INTO users (username, password, email)
+    VALUES ($1, $2, $3)
+    RETURNING user_id, created_at, updated_at;
+    `
 
-	err := s.client.QueryRowContext(
-		ctx,
-		query,
-		user.Name,
-		user.Password.hash,
-		user.Email,
-	).Scan(
-		&user.UserID,
-		&user.CreatedAt,
-	)
+	err := s.client.
+		QueryRowContext(ctx, query,
+			user.Username,
+			user.Password,
+			user.Email,
+		).
+		Scan(
+			&user.UserID,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
 
 	if err != nil {
 		return err
