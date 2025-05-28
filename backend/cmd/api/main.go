@@ -2,9 +2,11 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/auth"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/db"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/llm"
@@ -73,6 +75,17 @@ func main() {
 			token: env.GetString("OPEN_AI_SECRET", "openai_key"),
 			model: "gpt-3.5-turbo",
 		},
+		authCredencials: authConfig{
+			authCredencials: authCredencialsConfig{
+				clientID: env.GetString("CLIENT_ID", "test_id"),
+				password: env.GetString("PASSWORD_CLIENT", "12345_test_client_password_!"),
+			},
+			token: tokenConfig{
+				secret: env.GetString("SECRET", "secret_test"),
+				exp:    time.Hour * 2,
+				iss:    env.GetString("ISS", "imagegenaratingrestapi"),
+			},
+		},
 
 		env: env.GetString("ENV", "development"),
 	}
@@ -108,6 +121,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	tokenHost := "rag_system"
+
+	jwtAuthenticator := auth.NewJWTAuthtenticator(cfg.authCredencials.token.secret, tokenHost, tokenHost)
 
 	weaviateStore := store.NewWeaviateStorage(weaviateClient)
 	redisStore := store.NewRedisStorage(redisClient)

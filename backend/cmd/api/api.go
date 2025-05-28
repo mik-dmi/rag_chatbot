@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"errors"
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
+	"github.com/mik-dmi/rag_chatbot/backend/internal/auth"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	"github.com/mik-dmi/rag_chatbot/backend/utils/middleware"
 	"github.com/tmc/langchaingo/llms/openai"
@@ -20,6 +24,7 @@ type application struct {
 	postgreStore  store.PostgreStorage
 	openaiClients OpenaiClients
 	logger        *zap.SugaredLogger
+	authenticator auth.Authenticator
 }
 type OpenaiClients struct {
 	standaloneChainClient *openai.LLM
@@ -33,7 +38,23 @@ type config struct {
 	env                string
 	standaloneLLMModel llmConfig
 	mainLLMModel       llmConfig
+	authCredencials    authConfig
 }
+
+type authConfig struct {
+	authCredencials authCredencialsConfig
+	token           tokenConfig
+}
+type authCredencialsConfig struct {
+	clientID string
+	password string
+}
+type tokenConfig struct {
+	secret string
+	exp    time.Duration
+	iss    string
+}
+
 type llmConfig struct {
 	token string
 	model string
@@ -58,6 +79,7 @@ type redisDBConfig struct {
 func (app *application) mount() *http.ServeMux {
 	router := http.NewServeMux()
 
+	router.HandleFunc("POST /jwt-token-auth", app.jwtTokenHandler)
 	router.HandleFunc("POST /query", app.userQuestionHandler)
 	router.HandleFunc("POST /vector-db", app.createVectorHandler)
 	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
@@ -80,7 +102,7 @@ func (app *application) Run(mux *http.ServeMux) error {
 		middleware.Logging,
 	)
 
-	svr := &http.Server{
+	srv := &http.Server{
 		Addr:         app.config.addr,
 		Handler:      stack(mux),
 		WriteTimeout: time.Second * 30,
@@ -88,8 +110,37 @@ func (app *application) Run(mux *http.ServeMux) error {
 		IdleTimeout:  time.Minute,
 	}
 
-	fmt.Println("server is running at", app.config.addr)
-	return svr.ListenAndServe()
+	shutdown := make(chan error)
+
+	go func() {
+		quit := make(chan os.Signal, 1)
+
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+		s := <-quit
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		app.logger.Infow("signal caught", "signal", s.String())
+
+		shutdown <- srv.Shutdown(ctx)
+	}()
+
+	app.logger.Infow("server has started", "addr", app.config.addr, "env", app.config.env)
+
+	err := srv.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+
+	err = <-shutdown
+	if err != nil {
+		return err
+	}
+
+	app.logger.Infow("server has stopped", "addr", app.config.addr, "env", app.config.env)
+
+	return nil
 
 }
 
