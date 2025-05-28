@@ -10,9 +10,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/auth"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
-	"github.com/mik-dmi/rag_chatbot/backend/utils/middleware"
 	"github.com/tmc/langchaingo/llms/openai"
 	"go.uber.org/zap"
 )
@@ -76,35 +77,40 @@ type redisDBConfig struct {
 	password string
 }
 
-func (app *application) mount() *http.ServeMux {
-	router := http.NewServeMux()
+func (app *application) mount() http.Handler {
+	router := chi.NewRouter()
 
-	router.HandleFunc("POST /jwt-token-auth", app.jwtTokenHandler)
-	router.HandleFunc("POST /query", app.userQuestionHandler)
-	router.HandleFunc("POST /vector-db", app.createVectorHandler)
-	router.HandleFunc("GET /vector-db/object", app.getObjectIDByChapterHandler)
-	router.HandleFunc("DELETE /vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
-	router.HandleFunc("PATCH /vector-db/object/{id}", app.updateVectorObjectByIdHandler)
+	router.Use(middleware.RequestID)
+	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)
+	router.Use(middleware.Recoverer)
 
-	router.HandleFunc("GET /{userId}", app.getUserHandler)
+	router.Route("/v1/authentication", func(r chi.Router) {
+		router.Post("/jwt-token-auth", app.jwtTokenHandler)
+	})
 
-	v1 := http.NewServeMux()
-	v1.Handle("/v1/", http.StripPrefix("/v1", router)) //dealing with subrouting
-	return v1
+	router.Route("/v1", func(r chi.Router) {
+
+		router.Use(app.AuthTokenMiddleware)
+
+		router.Post("/query", app.userQuestionHandler)
+		router.Post("/vector-db", app.createVectorHandler)
+		router.Get("/vector-db/object", app.getObjectIDByChapterHandler)
+		router.Delete("/vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
+		router.Patch("/vector-db/object/{id}", app.updateVectorObjectByIdHandler)
+		router.Get("/{userId}", app.getUserHandler)
+
+	})
+
+	return router
 
 }
 
-func (app *application) Run(mux *http.ServeMux) error {
-
-	stack := middleware.CreateStack(
-		middleware.Timeout(90*time.Second),
-		middleware.Recovery, // Added first (but runs last)
-		middleware.Logging,
-	)
+func (app *application) Run(mux http.Handler) error {
 
 	srv := &http.Server{
 		Addr:         app.config.addr,
-		Handler:      stack(mux),
+		Handler:      mux,
 		WriteTimeout: time.Second * 30,
 		ReadTimeout:  time.Second * 10,
 		IdleTimeout:  time.Minute,

@@ -45,7 +45,9 @@ func (app *application) jwtTokenHandler(w http.ResponseWriter, r *http.Request) 
 		"suv": userID,
 		"exp": time.Now().Add(app.config.authCredencials.token.exp).Unix(),
 		"iat": time.Now().Unix(),
-		"iss": time.Now().Unix(),
+		"nbf": time.Now().Unix(),
+		"iss": app.config.authCredencials.token.iss,
+		"aud": app.config.authCredencials.token.iss,
 	}
 	token, err := app.authenticator.GenerateToken(claims)
 	if err != nil {

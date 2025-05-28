@@ -83,7 +83,7 @@ func main() {
 			token: tokenConfig{
 				secret: env.GetString("SECRET", "secret_test"),
 				exp:    time.Hour * 2,
-				iss:    env.GetString("ISS", "imagegenaratingrestapi"),
+				iss:    env.GetString("ISS", "rag_system"),
 			},
 		},
 
@@ -123,7 +123,7 @@ func main() {
 	}
 	tokenHost := "rag_system"
 
-	jwtAuthenticator := auth.NewJWTAuthtenticator(cfg.authCredencials.token.secret, tokenHost, tokenHost)
+	jwtAuthenticator := auth.NewJWTAuthenticator(cfg.authCredencials.token.secret, tokenHost, tokenHost)
 
 	weaviateStore := store.NewWeaviateStorage(weaviateClient)
 	redisStore := store.NewRedisStorage(redisClient)
@@ -137,7 +137,8 @@ func main() {
 			standaloneChainClient: standaloneChainOpenaiClient,
 			mainChainClient:       mainChainOpenaiClient,
 		},
-		logger: logger,
+		logger:        logger,
+		authenticator: jwtAuthenticator,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))
