@@ -3,22 +3,36 @@ package store
 import (
 	"context"
 	"database/sql"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UsersStore struct {
 	client *sql.DB
 }
 type PostgreUser struct {
-	UserID    string `json:"user_id"`
-	Username  string `json:"username"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	UserID    string   `json:"user_id"`
+	Username  string   `json:"username"`
+	Email     string   `json:"email"`
+	Password  password `json:"-"`
+	CreatedAt string   `json:"created_at"`
+	UpdatedAt string   `json:"updated_at"`
 }
 type password struct {
 	text *string
 	hash []byte
+}
+
+func (p *password) Set(text string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(text), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	p.text = &text
+	p.hash = hash
+
+	return nil
 }
 
 func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUser, error) {
@@ -41,7 +55,7 @@ func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUs
 		&user.UserID,
 		&user.Username,
 		&user.Email,
-		&user.Password,
+		&user.Password.hash,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -53,7 +67,6 @@ func (s *UsersStore) GetUserById(ctx context.Context, userId string) (*PostgreUs
 			return nil, err
 		}
 	}
-
 	return user, nil
 }
 
@@ -63,11 +76,10 @@ func (s *UsersStore) CreateUser(ctx context.Context, user *PostgreUser) error {
     VALUES ($1, $2, $3)
     RETURNING user_id, created_at, updated_at;
     `
-
 	err := s.client.
 		QueryRowContext(ctx, query,
 			user.Username,
-			user.Password,
+			user.Password.hash,
 			user.Email,
 		).
 		Scan(
@@ -75,10 +87,31 @@ func (s *UsersStore) CreateUser(ctx context.Context, user *PostgreUser) error {
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
-
 	if err != nil {
 		return err
 	}
 	return nil
+}
 
+func (s *UsersStore) CreateAndInvite(ctx context.Context, user *PostgreUser, token string) error {
+	const query = `
+    INSERT INTO users (username, password, email)
+    VALUES ($1, $2, $3)
+    RETURNING user_id, created_at, updated_at;
+    `
+	err := s.client.
+		QueryRowContext(ctx, query,
+			user.Username,
+			user.Password.hash,
+			user.Email,
+		).
+		Scan(
+			&user.UserID,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+	if err != nil {
+		return err
+	}
+	return nil
 }

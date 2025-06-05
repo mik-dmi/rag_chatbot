@@ -87,6 +87,8 @@ func (app *application) mount() http.Handler {
 
 	router.Route("/v1/authentication", func(r chi.Router) {
 		router.Post("/jwt-token-auth", app.jwtTokenHandler)
+		router.Post("/user-auth", app.jwtTokenHandler)
+
 	})
 
 	router.Route("/v1", func(r chi.Router) {
@@ -99,6 +101,7 @@ func (app *application) mount() http.Handler {
 		router.Delete("/vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
 		router.Patch("/vector-db/object/{id}", app.updateVectorObjectByIdHandler)
 		router.Get("/{userId}", app.getUserHandler)
+		router.Post("/create-user", app.createUserHandler)
 
 	})
 

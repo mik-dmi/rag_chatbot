@@ -39,6 +39,7 @@ type PostgreStorage struct {
 	Users interface {
 		CreateUser(context.Context, *PostgreUser) error
 		GetUserById(context.Context, string) (*PostgreUser, error)
+		CreateAndInvite(context.Context, *PostgreUser, string) error
 	}
 }
 

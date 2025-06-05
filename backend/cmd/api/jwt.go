@@ -14,7 +14,6 @@ type jwtTokenPayload struct {
 
 func (app *application) jwtTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var credentials jwtTokenPayload
-
 	if err := readJSON(w, r, &credentials); err != nil {
 		app.badRequestError(w, r, err)
 		return
@@ -33,14 +32,12 @@ func (app *application) jwtTokenHandler(w http.ResponseWriter, r *http.Request) 
 		app.unauthorizedErrorResponse(w, r, ErrorUserNotAuthorized)
 		return
 	}
-
 	//get session_iD, that represents a unique user
 	userID := r.Header.Get("X-User-ID")
 	if userID == "" {
 		app.badRequestResponse(w, r, ErrorMissingSessionIDHeader)
 		return
 	}
-
 	claims := jwt.MapClaims{
 		"suv": userID,
 		"exp": time.Now().Add(app.config.authCredencials.token.exp).Unix(),
@@ -54,10 +51,7 @@ func (app *application) jwtTokenHandler(w http.ResponseWriter, r *http.Request) 
 		app.internalServerError(w, r, err)
 		return
 	}
-
 	if err := app.jsonResponse(w, http.StatusCreated, token); err != nil {
 		app.internalServerError(w, r, err)
-
 	}
-
 }

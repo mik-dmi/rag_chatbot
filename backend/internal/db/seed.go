@@ -44,7 +44,6 @@ func generateUsers(num int) []*store.PostgreUser {
 		users[i] = &store.PostgreUser{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i),
 			Email:    usernames[i%len(usernames)] + fmt.Sprintf("%d", i) + "@example.com",
-			Password: "",
 		}
 	}
 	return users
