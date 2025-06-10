@@ -86,6 +86,9 @@ func main() {
 				iss:    env.GetString("ISS", "rag_system"),
 			},
 		},
+		mail: mailConfig{
+			exp: time.Hour * 24 * 3,
+		},
 
 		env: env.GetString("ENV", "development"),
 	}

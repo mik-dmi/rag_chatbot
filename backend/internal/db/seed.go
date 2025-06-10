@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -21,18 +22,20 @@ var usernames = []string{
 	"rapid_iguana", "vortex_gryphon", "iron_fang", "steel_talon", "crimson_mantis",
 }
 
-func Seed(postgresStore store.PostgreStorage) {
+func Seed(postgresStore store.PostgreStorage, db *sql.DB) {
 	ctx := context.Background()
 
 	users := generateUsers(100)
+	tx, _ := db.BeginTx(ctx, nil)
 
 	for _, user := range users {
-		if err := postgresStore.Users.CreateUser(ctx, user); err != nil {
+		if err := postgresStore.Users.CreateUser(ctx, tx, user); err != nil {
 			log.Println("Error creating user:", err)
 			return
 		}
 	}
 
+	tx.Commit()
 	log.Println("Seeding complete")
 
 }

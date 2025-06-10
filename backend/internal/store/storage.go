@@ -15,6 +15,8 @@ var (
 	ErrNotFound             = errors.New("vector not found")
 	ErrChapterAlreadyExists = errors.New("already exists in weaviate")
 	QueryTimeoutDuration    = time.Second * 5
+	ErrDuplicateEmail       = errors.New("user with that email already exist")
+	ErrDuplicateUsername    = errors.New("user with that user name already exists")
 )
 
 type WeaviateStorage struct {
@@ -37,9 +39,10 @@ type RedisStorage struct {
 
 type PostgreStorage struct {
 	Users interface {
-		CreateUser(context.Context, *PostgreUser) error
+		CreateUser(context.Context, *sql.Tx, *PostgreUser) error
 		GetUserById(context.Context, string) (*PostgreUser, error)
-		CreateAndInvite(context.Context, *PostgreUser, string) error
+		CreateAndInvite(context.Context, *PostgreUser, string, time.Duration) error
+		Activate(context.Context, string) error
 	}
 }
 
@@ -59,5 +62,19 @@ func NewPostgreStorage(client *sql.DB) PostgreStorage {
 	return PostgreStorage{
 		Users: &UsersStore{client},
 	}
+
+}
+
+func withTx(db *sql.DB, ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 
 }

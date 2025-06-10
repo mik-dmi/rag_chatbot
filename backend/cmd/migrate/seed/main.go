@@ -20,5 +20,5 @@ func main() {
 
 	store := store.NewPostgreStorage(conn)
 
-	db.Seed(store)
+	db.Seed(store, conn)
 }

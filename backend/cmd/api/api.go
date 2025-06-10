@@ -40,6 +40,11 @@ type config struct {
 	standaloneLLMModel llmConfig
 	mainLLMModel       llmConfig
 	authCredencials    authConfig
+	mail               mailConfig
+}
+
+type mailConfig struct {
+	exp time.Duration
 }
 
 type authConfig struct {
@@ -87,22 +92,32 @@ func (app *application) mount() http.Handler {
 
 	router.Route("/v1/authentication", func(r chi.Router) {
 		router.Post("/jwt-token-auth", app.jwtTokenHandler)
-		router.Post("/user-auth", app.jwtTokenHandler)
+		r.Post("/user", app.registerUserHandler)
 
 	})
 
 	router.Route("/v1", func(r chi.Router) {
 
-		router.Use(app.AuthTokenMiddleware)
+		r.Use(app.AuthTokenMiddleware)
 
-		router.Post("/query", app.userQuestionHandler)
-		router.Post("/vector-db", app.createVectorHandler)
-		router.Get("/vector-db/object", app.getObjectIDByChapterHandler)
-		router.Delete("/vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
-		router.Patch("/vector-db/object/{id}", app.updateVectorObjectByIdHandler)
-		router.Get("/{userId}", app.getUserHandler)
-		router.Post("/create-user", app.createUserHandler)
+		r.Post("/vector-db", app.createVectorHandler)
+		r.Get("/vector-db/object", app.getObjectIDByChapterHandler)
+		r.Delete("/vector-db/object/{id}", app.deleteVectorObjectByIdHandler)
+		r.Patch("/vector-db/object/{id}", app.updateVectorObjectByIdHandler)
 
+		r.Route("/users", func(r chi.Router) {
+			r.Put("/activate/{token}", app.activateUserHandler)
+
+			r.Route("/{userID}", func(r chi.Router) {
+				r.Use(app.AuthTokenMiddleware)
+				r.Get("/", app.getUserHandler)
+
+				r.Post("/query", app.userQuestionHandler)
+				//r.Post("/create-user", app.createUserHandler)
+
+			})
+
+		})
 	})
 
 	return router

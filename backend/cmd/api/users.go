@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 )
 
@@ -39,6 +40,25 @@ func (app *application) getUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) activateUserHandler(w http.ResponseWriter, r *http.Request) {
+	token := chi.URLParam(r, "token")
+
+	err := app.postgreStore.Users.Activate(r.Context(), token)
+	if err != nil {
+		switch err {
+		case store.ErrNotFound:
+			app.notFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+	if err := app.jsonResponse(w, http.StatusNoContent, ""); err != nil {
+		app.internalServerError(w, r, err)
+	}
+}
+
+/*
 func (app *application) createUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	var newUserData RegiterUserPayload
@@ -53,5 +73,5 @@ func (app *application) createUserHandler(w http.ResponseWriter, r *http.Request
 	ctx := r.Context()
 
 	app.postgreStore.CreateUser(ctx)
-
 }
+*/
