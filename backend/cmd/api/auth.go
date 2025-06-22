@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/mailer"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 )
 
@@ -64,6 +65,17 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	//send mail
+
+	isProdEnv := app.config.env == "production"
+
+	vars := struct{}
+
+	err = app.mailer.Send(mailer.UserWelcomeTemplate, user.Username, user.Email, vars, !isProdEnv)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
 	if err = app.jsonResponse(w, http.StatusCreated, userWithToken); err != nil {
 		app.internalServerError(w, r, err)
 	}

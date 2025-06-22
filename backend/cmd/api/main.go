@@ -10,6 +10,7 @@ import (
 	"github.com/mik-dmi/rag_chatbot/backend/internal/db"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/env"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/llm"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/mailer"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	lg "github.com/mik-dmi/rag_chatbot/backend/utils/logger"
 	"go.uber.org/zap"
@@ -87,7 +88,11 @@ func main() {
 			},
 		},
 		mail: mailConfig{
-			exp: time.Hour * 24 * 3,
+			exp:       time.Hour * 24 * 3,
+			fromEmail: env.GetString("FROM_EMAIL", ""),
+			sendGrid: sendGridConfig{
+				apiKey: env.GetString("SENDGRID_API_KEY", ""),
+			},
 		},
 
 		env: env.GetString("ENV", "development"),
@@ -120,6 +125,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	mailer := mailer.NewSendgrind(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
+
 	standaloneChainOpenaiClient, mainChainOpenaiClient, err := llm.NewOpenaiClient(cfg.standaloneLLMModel.token, cfg.mainLLMModel.token, cfg.standaloneLLMModel.model, cfg.mainLLMModel.model)
 	if err != nil {
 		log.Fatal(err)
@@ -142,6 +149,7 @@ func main() {
 		},
 		logger:        logger,
 		authenticator: jwtAuthenticator,
+		mailer:        mailer,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

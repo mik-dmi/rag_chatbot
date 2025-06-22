@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/auth"
+	"github.com/mik-dmi/rag_chatbot/backend/internal/mailer"
 	"github.com/mik-dmi/rag_chatbot/backend/internal/store"
 	"github.com/tmc/langchaingo/llms/openai"
 	"go.uber.org/zap"
@@ -26,6 +27,7 @@ type application struct {
 	openaiClients OpenaiClients
 	logger        *zap.SugaredLogger
 	authenticator auth.Authenticator
+	mailer        mailer.Client
 }
 type OpenaiClients struct {
 	standaloneChainClient *openai.LLM
@@ -44,7 +46,12 @@ type config struct {
 }
 
 type mailConfig struct {
-	exp time.Duration
+	fromEmail string
+	sendGrid  sendGridConfig
+	exp       time.Duration
+}
+type sendGridConfig struct {
+	apiKey string
 }
 
 type authConfig struct {
