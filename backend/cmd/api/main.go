@@ -46,13 +46,14 @@ const version = "0.0.1"
 
 func main() {
 
-	err := godotenv.Load() //"../../.env"
+	err := godotenv.Load("../../.env") //"../../.env"
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
 
 	cfg := config{
-		addr: env.GetString("ADDR", ":8080"),
+		addr:        env.GetString("ADDR", ":8080"),
+		frontendURL: env.GetString("FRONTEND_URL", "http://localhost:4000"),
 		weaviateDB: weaviateDBConfig{
 			addr: env.GetString("WEAVIATE_DB_PORT", ":8080"),
 			host: env.GetString("WEAVIATE_DB_HOST", "localhost"),
@@ -89,9 +90,9 @@ func main() {
 		},
 		mail: mailConfig{
 			exp:       time.Hour * 24 * 3,
-			fromEmail: env.GetString("FROM_EMAIL", ""),
-			sendGrid: sendGridConfig{
-				apiKey: env.GetString("SENDGRID_API_KEY", ""),
+			fromEmail: env.GetString("FROM_EMAIL", "hello@demomailtrap.co"),
+			mailTrap: mailTrapConfig{
+				apiKey: env.GetString("MAILTRAP_API_KEY", ""),
 			},
 		},
 
@@ -125,8 +126,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mailer := mailer.NewSendgrind(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
+	//mailer := mailer.NewSendgrind(cfg.mail.sendGrid.apiKey, cfg.mail.fromEmail)
 
+	mailtrap, err := mailer.NewMailTrapClient(cfg.mail.mailTrap.apiKey, cfg.mail.fromEmail)
+	if err != nil {
+		logger.Fatal(err)
+	}
 	standaloneChainOpenaiClient, mainChainOpenaiClient, err := llm.NewOpenaiClient(cfg.standaloneLLMModel.token, cfg.mainLLMModel.token, cfg.standaloneLLMModel.model, cfg.mainLLMModel.model)
 	if err != nil {
 		log.Fatal(err)
@@ -149,7 +154,7 @@ func main() {
 		},
 		logger:        logger,
 		authenticator: jwtAuthenticator,
-		mailer:        mailer,
+		mailer:        mailtrap,
 	}
 	mux := app.mount()
 	log.Fatal(app.Run(mux))

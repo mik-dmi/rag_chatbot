@@ -27,7 +27,7 @@ type application struct {
 	openaiClients OpenaiClients
 	logger        *zap.SugaredLogger
 	authenticator auth.Authenticator
-	mailer        mailer.Client
+	mailer        mailer.MailtrapClient
 }
 type OpenaiClients struct {
 	standaloneChainClient *openai.LLM
@@ -43,13 +43,19 @@ type config struct {
 	mainLLMModel       llmConfig
 	authCredencials    authConfig
 	mail               mailConfig
+	frontendURL        string
 }
 
 type mailConfig struct {
 	fromEmail string
-	sendGrid  sendGridConfig
-	exp       time.Duration
+	//sendGrid  sendGridConfig
+	mailTrap mailTrapConfig
+	exp      time.Duration
 }
+type mailTrapConfig struct {
+	apiKey string
+}
+
 type sendGridConfig struct {
 	apiKey string
 }

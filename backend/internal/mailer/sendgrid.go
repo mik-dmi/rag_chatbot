@@ -48,6 +48,7 @@ func (m *SendgridMailer) Send(templateFile, username, email string, data any, is
 	}
 	message := mail.NewSingleEmail(from, subject.String(), to, "", body.String())
 
+	
 	message.SetMailSettings(&mail.MailSettings{
 		SandboxMode: &mail.Setting{
 			Enable: &isSandbox,

@@ -43,6 +43,7 @@ type PostgreStorage struct {
 		GetUserById(context.Context, string) (*PostgreUser, error)
 		CreateAndInvite(context.Context, *PostgreUser, string, time.Duration) error
 		Activate(context.Context, string) error
+		Delete(context.Context, string) error
 	}
 }
 
